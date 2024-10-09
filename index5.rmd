@@ -1,0 +1,1197 @@
+
+---
+title: "scRNAseq Analysis"
+author: "Pauli Tikka"
+date: "`r Sys.Date()`"
+output: 
+ rmdformats::downcute: #note the ':' it is needed: https://stackoverflow.com/questions/43527520/r-markdown-yaml-scanner-error-mapping-values
+  self_contained: true
+  thumbnails: true
+  lightbox: true
+  gallery: false
+  highlight: tango
+  # code_folding: show
+  # fig.align = 'left'
+
+
+---
+
+# Introduction
+```{r, warning=FALSE,message=FALSE}
+
+# Welcome to the 'scRNAseq data analysis' webpage! 
+
+# The procedures and explanations to make all the analysis and plots are in their individual chapters below. 
+# These methods could be also easily applied to other types of data sets and metabolites than 'tooth metabolites' and their respective metadata per se. 
+# In addition, there is a small 'disclaimer' also at the end of this webpage to emphasize that this site is mainly for educational purposes.
+# Please let me know if you have any questions. For that, use the 'following' email: patati at the university of Turku
+
+```
+
+
+# Loading All R Packages
+```{r, warning=FALSE,message=FALSE}
+library(rlang); library(dplyr); #Error: package 'rtracklayer' could not be loaded, Error: (converted from warning) package 'rlang' was built under R version 4.2.3
+library(BSgenome);library(eisaR);library(GenomicFeatures);library(tximeta);
+library(rjson);library(reticulate);library(scater);
+library(jsonlite);library(R6);library(loomR);library(LoomExperiment); 
+library(SeuratDisk);library(sf); library(checkmate);library(tidyr) 
+library("monocle3"); #copy pasted older and it seemed to work,,,
+library(AUCell);library(SCENIC);library(GENIE3);library('xgboost');library(KernSmooth);
+library(plotly);library(BiocParallel);library(data.table);library(doSNOW);library(doParallel);
+library(Rmpi);library(doMPI);library(SMITE);library(Seurat);library(SeuratData);library(SCopeLoomR);library(biomaRt);library(singleCellTK);library(tools);library(scclusteval) #
+library(VISION); library(zellkonverter);library(scRNAseq);library(org.Mm.eg.db);library(AnnotationDbi);library(IntEREst); library(janitor);
+library(COSG);library(scMerge);library("htmltools");library(R.utils);library(xlsx);# library(m3adgfdon);
+library(monocle);library(scrubletR);suppressMessages(require(DoubletFinder));library(scDblFinder);library(DoubletDecon); library(VennDiagram);library(pathviewr)
+library(SeuratWrappers);library(patchwork);library(popsicleR);library("proxy");library("spatstat.geom")
+library(SeuratDisk);library(rhdf5);library(qdapRegex);library(demCore) #library(Giotto);
+library(tidyverse);library(sleepwalk);library(umap);library(BiocIO);library(rhdf5);library(MASS);library(gplots);library(SCINA);library(nichenetr)
+library(hdf5r);library(stringi);library(Rcpp);library(harmony);library(limma);library(stats4);library(parallel);library(BiocGenerics);library(S4Vectors);
+library(IRanges);library(GenomeInfoDb);library(GenomicRanges);library(Matrix);library(Biobase);library(matrixStats);library(MatrixGenerics);library(SummarizedExperiment);
+library(lpSolve);library(ROI);library(rcbc);library(ROI.plugin.glpk);require(tidyverse);require(ROI.plugin.symphony);require(ompr);require(ompr.roi)
+library(SingleCellExperiment);library(DESeq2);library(usethis);library(devtools);library(runjags);require(openxlsx)
+library(reshape2);library(PRROC);library(WriteXLS);library(rpart);library(rpart.plot);library('lpsymphony')
+set.seed(1234);library(stringr);library(rlist);library(gdata);library(splines);library(factoextra);library(cluster);library(VGAM);library(scuttle);library(scran);library(scater)
+library(glmGamPoi);library(RColorBrewer);library(ggplot2);library(bit);library(bit64);library(stats4);library(lattice);library(SingleCellExperiment); library(BayesSpace)
+library(Rmisc);library(XVector);library(Biostrings);library(Rsamtools);#library(Signac);
+library(shiny);library(Matrix);library(patchwork);library(Factoshiny)
+library("org.Hs.eg.db");library(grid);library(circlize); library(SparkR);library(base);library(namespace);library(BH) ;library(conos);library(affyio);library(ArrayExpress);library(oligo);
+library(trendsceek);library(runjags);library(ggthemes);library(ggbeeswarm);library(destiny);library(slingshot);library(gtools);library(ggraph);library(clustree)
+require(scales);require(scran);require(cowplot);library(sctransform);library(affy); library(hrbrthemes)
+library(clustifyr); library(FactoMineR); library(missMDA); library(FactoInvestigate)
+library(BiocManager);library(usethis);library(devtools);library(leidenbase);library(scDblFinder);library(parallelDist);library(ggvenn);library(sparklyr)
+library('igraph') ;library('future') ;library('future.apply');library('pbapply') ;library('irlba'); library(caret) 
+library('NMF');library('ggalluvial') ;library('stringr');library('svglite');library('expm'); library(VennDiagram);library(ggvenn);
+library(SpatialExperiment) ;library('Rtsne');library('ggrepel') ;library('circlize');library('cowplot');library('ComplexHeatmap') ;library('RSpectra') 
+library('Rcpp');library('RcppEigen');library('reticulate');library('scales') ;library('sna') ;library('forcats') ;library('reshape2') ;library('FNN') ;library('shape') 
+library('BiocGenerics');library('magrittr') ;library('colorspace') ;library('plyr');library(patchwork);options(stringsAsFactors = FALSE)
+library(presto);library(ggpubr);library(png);library(magick);require(dplyr);require(magick);require(cowplot);
+library(caret);library(AppliedPredictiveModeling); library(BayesSpace);library(CellChat); #library(scCustomize);
+library(berryFunctions);library(dataMaid)
+library(cluster); library(factoextra); library(raveio);library(segmented)
+#scCustomize and Signac does not work at the moment 30.9.24...
+
+
+```
+
+
+# Setting Global Variables
+```{r, warning=FALSE,message=FALSE}
+thedate <- strftime(Sys.Date(),"%d%m%y")
+date=paste0('tikka',thedate) # Change this...# install.packages("ppcor") just in case the 'install' function here...
+namedate = date#Change this (!)
+# font_import() # This is important if you have not loaded them before
+# loadfonts(device = "win") #Same applies here.
+gc(); memory.limit(9999999999999);options(scipen = 999) #you do not want to see scientific numbering # You need to have rtools: https://cran.r-project.org/bin/windows/Rtools/rtools40.html
+write('PATH="${RTOOLS40_HOME}\\usr\\bin;${PATH}"', file = "~/.Renviron", append = TRUE); 
+# The mart/ensemble is often problematic (does not load or find the server). So, instead of loading this, try to save this...  or check host: 
+# Sys.unsetenv("GITHUB_PAT"); mart <- useMart('ensembl', dataset = 'mmusculus_gene_ensembl', host = 'https://useast.ensembl.org') 
+mart <- useEnsembl(biomart = "ensembl", dataset = 'mmusculus_gene_ensembl',mirror = "uswest") #?useEnsembl
+# https://support.bioconductor.org/p/108324/
+#Check also the place where to save:
+ok='E:/uuttapuutta/'
+setwd(dir=ok) #load(file = "hei.Rdata") #save.image('hei.Rdata')
+
+```
+
+
+# Importing Data and Metadata
+```{r, warning=FALSE,message=FALSE}
+#https://stackoverflow.com/questions/47295443/r-install-package-loaded-namespace
+#1) Set the working directory and load the data:
+#it is good to put one data 'type' as a folder:
+# setwd(dir='D:/Data for Seurat Analysis/filtered_gene_bc_matrices/Data Filtered and Processed in Seurat/Corrected/E11/new2') #amap/lapimeno stands for 'as much as possible'
+#Last spring (2021) data:
+
+# load("C:/Users/patati/Desktop/TurkuOW/RWork/all.RData")
+
+# #e 11... the below would better be a function:
+# pbmc1.data <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E11.5_May21/mandible1_count/outs/filtered_feature_bc_matrix.h5")
+# p11_1 <- CreateSeuratObject(counts = pbmc1.data, project = "E11.5_1", min.cells = 3, min.features = 200)
+# pbmc2.data <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E11.5_May21/mandible2_count/outs/filtered_feature_bc_matrix.h5")
+# p11_2 <- CreateSeuratObject(counts = pbmc2.data, project = "E11.5_2", min.cells = 3, min.features = 200)
+# pbmc3.data <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E11.5_May21/mandible3_count/outs/filtered_feature_bc_matrix.h5")
+# p11_3 <- CreateSeuratObject(counts = pbmc3.data, project = "E11.5_3", min.cells = 3, min.features = 200)
+# pbmc4.data <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E11.5_May21/mandible4_count/outs/filtered_feature_bc_matrix.h5")
+# p11_4 <- CreateSeuratObject(counts = pbmc4.data, project = "E11.5_4", min.cells = 3, min.features = 200)
+# p11_5d <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E11_Oct21/1_count/outs/filtered_gene_bc_matrix.h5")
+# p11_5 <- CreateSeuratObject(counts = p11_5d, project = "E11.5_5", min.cells = 3, min.features = 200)
+# p11_6d <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E11_Oct21/2_count/outs/filtered_feature_bc_matrix.h5")
+# p11_6 <- CreateSeuratObject(counts = p11_6d, project = "E11.5_6", min.cells = 3, min.features = 200)
+# p11_7d <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E11_Oct21/3_count/outs/filtered_feature_bc_matrix.h5")
+# p11_7 <- CreateSeuratObject(counts = p11_7d, project = "E11.5_7", min.cells = 3, min.features = 200)
+# p11_8d <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E11_Oct21/4_count/outs/filtered_feature_bc_matrix.h5")
+# p11_8 <- CreateSeuratObject(counts = p11_8d, project = "E11.5_8", min.cells = 3, min.features = 200)
+# 
+# pbmc1l.data <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E14.25_May21/1_1_count/outs/filtered_feature_bc_matrix.h5")
+# p14_1 <- CreateSeuratObject(counts = pbmc1l.data, project = "E14.5_1", min.cells = 3, min.features = 200)
+# pbmc2l.data <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E14.25_May21/1_2_count/outs/filtered_feature_bc_matrix.h5")
+# p14_2 <- CreateSeuratObject(counts = pbmc2l.data, project = "E14.5_2", min.cells = 3, min.features = 200)
+# pbmc3l.data <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E14.25_May21/1_count/outs/filtered_feature_bc_matrix.h5")
+# p14_3 <- CreateSeuratObject(counts = pbmc3l.data, project = "E14.5_3", min.cells = 3, min.features = 200)
+# pbmc4l.data <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E14.25_May21/2_count/outs/filtered_feature_bc_matrix.h5")
+# p14_4 <- CreateSeuratObject(counts = pbmc4l.data, project = "E14.5_4", min.cells = 3, min.features = 200)
+# p14_5d <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E14.25 and E16_Oct21/E14-1_Oct21/outs/filtered_feature_bc_matrix.h5")
+# p14_5 <- CreateSeuratObject(counts = p14_5d, project = "E14.5_5", min.cells = 3, min.features = 200)
+# p14_6d <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E14.25 and E16_Oct21/E14-2_Oct21/outs/filtered_feature_bc_matrix.h5")
+# p14_6 <- CreateSeuratObject(counts = p14_6d, project = "E14.5_6", min.cells = 3, min.features = 200) #Maybe 20 was too little.., min.cells from 3 -> 10
+# 
+# p16_1d <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E14.25 and E16_Oct21/E16-1_Oct21/outs/filtered_feature_bc_matrix.h5")
+# p16_1 <- CreateSeuratObject(counts = p16_1d, project = "E16.5_1", min.cells = 3, min.features = 200)
+# p16_2d <- Read10X_h5("E:/scRNAseq Data and Reference E9/E11-16 Open/E14.25 and E16_Oct21/E16-2_Oct21/outs/filtered_feature_bc_matrix.h5")
+# p16_2 <- CreateSeuratObject(counts = p16_2d, project = "E16.5_2", min.cells = 3, min.features = 200) #http://rcompanion.org/handbook/
+# 
+# #Merging Works like this: # https://satijalab.org/signac/articles/merging.html
+# #total merge is not ok for filtering: data <- merge(p11_1, y = c(p11_2,p11_3,p11_4,p11_5,p11_6,p11_7,p11_8), project = "E11.5");gc(); #add.cell.ids = c("Later1", "Later2", "Later3", "Later4"),
+# data1a <- merge(p11_1, y = c(p11_2,p11_3,p11_4), project = "E11.5a");gc(); #add.cell.ids = c("Later1", "Later2", "Later3", "Later4"), p11_5,p11_6,p11_7,p11_8
+# # data1b <- merge(p11_5, y = c(p11_6,p11_7,p11_8), project = "E11.5b");gc();#test: p11_6 = merge(p11_6, y = c(p11_6), project = "E11.5_6");gc();p11_8 = merge(p11_8, y = c(p11_8,p11_8), project = "E11.5_8");gc();
+# # data2a <- merge(p14_1, y = c(p14_2,p14_3,p14_4), project = "E14.25a")
+# data2a <- merge(p14_1, y = c(p14_2,p14_3,p14_4,p14_5), project = "E14.25a")
+# # data2b <- merge(p14_5, y = c(p14_6), project = "E14.25b") #
+# data3 <- merge(p16_1, y = c(p16_2), project = "E16.5");gc();
+# 
+# gc();memory.limit(9999999999999); #testing: data2ax <- merge(p14_1, y = c(p14_2,p14_3,p14_4,p14_5,p14_6), project = "E14.25"); #data2ae=c(p14_1,p14_2,p14_3,p14_4,p14_5,p14_6)
+# 
+# #I rather put everything that leave away
+# gc();
+# rm(pbmc1.data,pbmc2.data,pbmc3.data,pbmc4.data,p11_5d,p11_6d,p11_7d,p11_8d,pbmc1l.data,pbmc2l.data,pbmc3l.data,pbmc4l.data,p11_5d,p11_6d,p11_7d,p11_8d,p14_5d,p14_6d,p16_1d,p16_2d)
+# rm(p11_1,p11_2,p11_3,p11_4,p11_5,p11_6,p11_7,p11_8); #rm(vari, date1o, latex) #remove big sets...
+
+# #In case you have ready data:
+#If you have the data save as mentioned below: https://www.techcoil.com/blog/how-to-save-and-load-environment-objects-in-r/
+# save.image(file='myEnvironment.RData')
+# You can just:
+# load('myEnvironment.RData')
+
+#This is where you want to save the whole environment, unless you want to do the loading and processing every time, which is like 15min per stage, i.e. like 1h
+# save.image(file='myEnvironment.RData')
+# save.image("C:/Users/patati/Desktop/TurkuOW/RWork/all.RData")
+load("C:/Users/patati/Desktop/TurkuOW/RWork/all.RData")
+
+#Filtered
+data1aa;data1aa[c('Sox2','Pitx2','Shh'),] 
+data2aa;data2aa[c('Sox2','Pitx2','Shh'),] 
+data3aa;data3aa[c('Sox2','Pitx2','Shh'),] 
+
+#Integrated, but now (21024 the data1 not ok int as per):
+Data1;Data1[c('Sox2','Pitx2','Shh'),] 
+Data2;Data2[c('Sox2','Pitx2','Shh'),] 
+Data3;Data3[c('Sox2','Pitx2','Shh'),] 
+
+
+#Before you have anything analysed, biologists want to know how many cells express the gene 'X' of interest in one (not all) of their experiments: # length(WhichCells(data, slot = 'data', expression = Sox2 > 0 & Pitx2)) #This is exclusive, both have to occure.. so not work..
+length(WhichCells(data1aa, slot = 'data', expression = Pitx2 > 0))#raw:868/424 length(WhichCells(data2a, slot = 'data', expression = Sox2 > 0))#raw:487/135 length(WhichCells(data3, slot = 'data', expression = Shh > 0))#raw:196/28 data # https://satijalab.org/seurat/articles/essential_commands.html
+
+
+
+
+```
+
+
+
+
+# The preporsessing function before the analysis
+```{r, warning=FALSE,message=FALSE,fig.width=8.0}
+
+Pre_anal_process=function(data,small,case='E11',mart) { #small to 'yes' if you have low number of cells in the sample
+  #General variables in testing:# data=data1ae;# mart <- useMart('ensembl', dataset = 'mmusculus_gene_ensembl', host = 'https://useast.ensembl.org') #The below works if ensemble looks like:
+  # data=data1a
+  # small='no';case = "E11"
+  DefaultAssay(data)='RNA' #Renaming cells in Seurat is not straightforward, e.g. if you do not want to show cell identities with their sample 'tag' at the end of sequence:
+  ok1=colnames(data); ok11=substr(ok1, 1, 16); data=RenameCells(data, new.names = make.names(ok11, unique=TRUE) )
+  #For Link AND HSP regression
+  x=rownames(data@assays[["RNA"]]@meta.features)
+  genes.meta<-getBM(mart = mart, attributes=c("ensembl_gene_id", "mgi_symbol", "go_id", 'gene_biotype'),filters="mgi_symbol",values=x)# getBM(attributes=c("ensembl_gene_id", "mgi_symbol", "go_id", 'gene_biotype'), filters="mgi_symbol",values=x,mart=ensembl) #%%useCache=F, note this..
+  m <- match(rownames(data@assays[["RNA"]]@data), genes.meta$mgi_symbol)
+  data@assays[["RNA"]]@meta.features<-cbind(data@assays[["RNA"]]@meta.features,genes.meta[m,])
+  #Lnc filter ideas:
+  lnc= c("lncRNA")
+  RN_link_genes<-c(rownames(data[(data@assays[["RNA"]]@meta.features$gene_biotype %in% lnc),]))
+  C<-GetAssayData(object = data, slot = "counts"); Link <- colSums(C[RN_link_genes,])/Matrix::colSums(C)*100
+  data <- AddMetaData(data, Link, col.name = "percent.link") #Mes=c('Mpz') #
+  #Mitos, ribos, largest gene:
+  data[["percent.mt"]] <- PercentageFeatureSet(data, pattern = "^mt-")
+  data[["percent_ribo"]] <- PercentageFeatureSet(data, pattern ='^Rpl|^Rps|^Mrpl|^Mrps')
+  data$Percent.Largest.Gene=apply(data@assays$RNA@counts,2,function(x)(100*max(x))/sum(x)) #Filtering ribosomal genes: # https://nbisweden.github.io/excelerate-scRNAseq/session-qc/Quality_control.html # # https://nbisweden.github.io/workshop-scRNAseq/labs/compiled/scater/scater_01_qc.html
+  #HSP:s
+  HSP_genes<-genes.meta[genes.meta$go_id=="GO:0034605",]$mgi_symbol; hsp.genes <- rownames(data)[grep("^Hsp",rownames(data))]
+  HSP_genes=c(hsp.genes,HSP_genes); C<-GetAssayData(object = data, slot = "counts"); Hsp <- colSums(C[HSP_genes,])/Matrix::colSums(C)*100 # data <- AddModuleScore(object = data,features = list(HSP_genes),name = 'HSP.score')
+  data <- AddMetaData(data, Hsp, col.name = "percent.hsp") #Mes=c('Mpz') #
+  #Blood score:
+  hello=c("Tnnt1", "Tmsb4x", "Celf2", "Tpm2", "Tpm1", "Ebf1", "Abracl", "Ttn", "Pdgfa",
+          "Mrln", "Ptprd", "Lrrn1", "Ybx3", "Zeb2", "Tubb2b", "S100a10", "Nexn", "Hes1", "Sh3glb1", "Foxp1", "Ntng1",
+          "Ktn1", "Ccnd3", "Ppp3ca", "Cadm1", "Actr3", "Ccdc141", "Pgf", "Clcn5", "Zc3h15", "Tgfb2", "Fcer1g", "Tyrobp", "Arhgdib",
+          "Coro1a", "Ptpn18", "Lst1", "Arpc1b", "Laptm5", "Cyba", "Itm2b", "Mef2c", "Cst3", "Lcp1", "Cd52", "B2m", "Sh3bgrl3","H19",
+          "Tspo", "Sat1", "Apoe", "Arpc5", "Ctsc", "Tagln2", "Gpx1", "Rac2", "Clic1", "Fth1", "Ctsz", "Erp29", "Cotl1", "Cx3cr1", "Glipr2",
+          "Ddx21", "Ncl", "Actb", "Gng11", "Mif", "Mdk", "Tubb5", "H2afz", "Hmgb2", "Tmsb10", "Fau", "Tpt1", "Eef1a1", "Hmgb1","Col4a1","Col4a2",
+          "Fabp5","Pgk1","Arhgdib","Laptm5","Meis2","Gap43","Mef2c","Itm2a", "Prrx1","Plxnd1","Kdr","Aldoa", 'Des') # Ptma", "Des",
+  #Let us take hb into account (28.6.21, tikka).. let us take them! (1.7.21)
+  hb.genes <- rownames(data)[grep("^Hb",rownames(data))]; hello=c(hello,hb.genes); hello=unique(hello); #length(hello) 102
+  #None of the blood genes should be epithelial ones:
+  krts2=rownames(data)[grep("^Krt",rownames(data))]; krts22=rownames(data)[grep("^Wnt",rownames(data))]
+  krts2=append(krts2, c("Epcam","Pitx2","Sox2","Foxi3","Sostdc1", "Dlx2", "Lef1", "p63", "Shh", "Noggin", "Sema3f",'Isl1', 'CD146', 'Nemo', 'Apc', 'Amel',
+                        "Fgf8", "Hh", "Axin2", "FzD6", "Sp6", "Edar","Tgfb1","Lgr5", "Dkk3", "Igfp5", "Sfn","Odam", 'Stro-1', 'Edaradd', 'Il11ra',
+                        "Fdcsp", "Slpi", "Odam", "Tuba1b", "Il1a", "Il1b", 'Pax9', 'Msx1', 'Msx2', 'Bmp2', 'Bmp4', 'Tbx3', 'Tbx2', 'Irf6', 'Irf6', 'Des',
+                        "Bmi1", "ABCG2", "Oct3/4", "Oct3", "Oct4","Yap", "Gli1", "Lrig1", "Fgf10", "p21", "Dkk4", "Fgf9", "Fgf20", 'Edar', 'Dsp', 'Dspp',
+                        'Ptma', 'Tpt1', 'Enam', 'Amelx','Mmp20', 'Amtn', 'Klk4', 'Dbi', 'Acta1','Actb','Pttg1', 'Atf3', 'Cldn10', 'Runx2',
+                        'Ambn','Sfrp5', 'Tbx1', 'Dmp1', 'Notch1', 'Notch2', 'Ccl12', 'Pttg1', 'Atf3', 'Trfc', 'Ntrk2', 'Foxa1', 'Foxa2',
+                        'Gjb6', 'Skap2', 'Lgr6', 'Lmo1', 'Gria2', 'Pcdh9', 'Kenh7', 'Lgals7', 'Pcp4l1', 'Npr3', 'Robo2', 'Kitl', 'Sic4a4', 'Cntn2', 'Unc5c', 'Rxfp1', 'Gjb2', 'Kcnj2',
+                        'Meis1', 'Col12a1', 'Timp3', 'Prss23', 'Ednrb', 'Ddit4l', 'Gad1', 'Sp5', 'Proser2', 'Pkp1', 'Ppl', 'Nebi', 'Marveld2', 'Tagln',
+                        'Acta2', 'Cpm', 'Dmrt2', 'Zcchc5', 'Rprm', 'Wisp1', 'Frnde1', 'Ntn1', 'Pax9', 'Foxc1',  'Hpca', 'Col14a1', 'Col9a1', 'Hpgd'))
+  #In addition, exclude these from the blood, house and dissociation filtering and removals, as per Ana
+  included=read.csv("E:/uuttapuutta/included.csv", header = FALSE);included=as.vector(included)$V1
+  #Possibly add new genes, check the article 2022 Ye et al
+  krts2=c(krts2,krts22,included);
+  # krts2=c(krts2,krts22);
+  hello=hello[!hello %in% unique(krts2)] # 
+  C<-GetAssayData(object = data, slot = "counts"); hello=hello[hello %in% rownames(C)]; percent.blood <- colSums(C[hello,])/Matrix::colSums(C)*100
+  data <- AddMetaData(data, percent.blood, col.name = "percent.blood") #Mes=c('Mpz') #
+  
+  #Krt score
+  jello=c('Krt5','Krt14','Krt17','Krt18'); C<-GetAssayData(object = data, slot = "counts"); jello=jello[jello %in% rownames(C)]; percent.KRT <- colSums(C[jello,])/Matrix::colSums(C)*100
+  data <- AddMetaData(data, percent.KRT, col.name = "percent.KRT") #
+  # VlnPlot(data , features = 'percent.KRT')+ylim(0,0.5)
+  # data[c('Pitx2','Sox2'),]
+  
+  #Met score; https://en.wikipedia.org/wiki/Mesenchymal%E2%80%93epithelial_transition
+  # E-cadherin/Cdh1, Cldns −3, −4, −7, −11, Occludin (Ocln), Epithelial cell adhesion molecule (Epcam), and Crumbs homolog 3 (Crb3), were all upregulated before Nanog, 
+  #a key transcription factor in maintaining pluripotency, was turned on. Additionally, mesenchymal-associated genes such as Snail, Slug, Zeb −1, −2, 
+  # and N-cadherin were downregulated within the first 5 days post-OKSM induction.[16] Addition of exogenous TGF-β1, which blocks MET, decreased iPS reprogramming efficiency significantly# Sox2, Epcam 
+  jello=c('Cdh1','Crb3','Cldn3','Cldn4','Cldn7','Cldn11','Ocln','Nanog','Epcam','Klf4','Sox2');
+  jello2=c('Tgfb1', 'Snail1', 'Snail2','Zeb1','Zeb2','Cdh2','Vim')
+  C<-GetAssayData(object = data, slot = "counts");
+  jello=jello[jello %in% rownames(C)]; jello2=jello2[jello2 %in% rownames(C)];
+  MET.Score <- colSums(C[jello,])/Matrix::colSums(C)*3 - (colSums(C[jello2,])/Matrix::colSums(C))*0.5
+  data <- AddMetaData(data, MET.Score, col.name = "MET.Score")
+  # VlnPlot(data , features = 'MET.Score')#+ylim(0,20)
+  # data[c('Pitx2','Sox2'),]
+  
+  #Emt score
+  # hello=c('Krt5','Krt14','Krt17','Krt18'); C<-GetAssayData(object = data, slot = "counts"); 
+  # hello=hello[hello %in% rownames(C)]; percent.KRT <- colSums(C[hello,])/Matrix::colSums(C)*100
+  # data <- AddMetaData(data, percent.KRT, col.name = "percent.KRT")
+  
+  #Housekeeping gene#Bone, hema, and stem.. + the basics
+  house=c("Col3a1", "Eef1b2", "Rpl37a", "Ptma", "Gas5", "H3f3a",  "Man1b1", "Set",  "Abl1", "Stam2",  "Hnrnpa3",      "Zfp106", "Serf2",  "B2m",  "Snrnp200",     "Csnk2a1",      "Gnas", "Sec62",  "Tpm3", "S100a4", "Atp5f1", "H2afz",  "Aco1", "Ybx1", "Ppih", "Sfpq", "Pum1", "Zdhhc18",      "Stmn1",  "Rer1",  "Srp72",  "Rplp0",  "Eif2b1", "Ubc",  "Chchd2", "Gusb", "Actb", "Flt1", "Hmgb1",  "Ptn",  "Hnrnpa2b1",    "Gadd45a",      "Mrpl19", "Snrpg",  "Rpl32", "Gapdh",  "Cdkn1b", "Ipo8", "Strn4",  "Psmc4",  "Rps16",  "Lsm14a", "Pop4", "Rpl13a", "Rpl18",  "Ldha", "Rps17",  "Ints4",  "1110004F10Rik","Gtf3c1", "Vps36",  "Calr", "Kars", "Cox4i1", "Hmbs", "Ddx6", "Edc3", "Rpl4", "Ppib", "Morf4l1",      "Oaz1", "Cactin", "Polr3b", "Tbk1", "Usp15",
+          "Naca",  "Pes1", "Ppia", "Sec61g", "Npm1", "Rack1",  "Ubb",  "Polr2a", "Cltc", "Nme2", "Casc3",  "Eif1", "Rpl27",  "Ddx5", "Rpl38", "H3f3b",  "Actg1",  "Brms1l", "Eif5", "Hnrnpk", "Sdha", "Cox7c",  "Btf3", "Dnajc9", "Sec24c", "Supt16", "Elf1", "Rpl37",  "Rpl30",  "Cox6c",
+          "Pabpc1", "Ywhaz",  "Cpsf1",  "Lgals1", "Ddx17",  "Cyp2d26",      "Pcbp2",  "Ubn1", "1810013L24Rik","Tfrc", "Snx4", "Hmgn1",  "Tbp",  "Atp6v0c",      "Hmga1", "Cdkn1a", "Rps18",  "Abcf1",  "Hsp90ab1",     "Taf4b",  "Iws1", "Eif1a",  "Fech", "Neat1",  "Ganab",  "Ddb1", "Mpp1", "Nono", "Pgk1", "Lgals12")
+  house=house[!house %in% unique(included)];
+  C<-GetAssayData(object = data, slot = "counts");house=house[house %in% rownames(C)]
+  percent.house <- colSums(C[c(house),])/Matrix::colSums(C)*100
+  data <- AddMetaData(data, percent.house, col.name = "percent.house") #Mes=c('Mpz') #
+  ### calculate the percentage of dissociation genes
+  dissociation_genes <- c("Actg1","Ankrd1","Arid5a","Atf3","Atf4","Bag3","Bhlhe40","Brd2","Btg1","Btg2","Ccnl1","Ccrn4l","Cebpb","Cebpd","Cebpg","Csrnp1","Cxcl1",
+                          "Cyr61","Dcn","Ddx3x","Ddx5","Des","Dnaja1","Dnajb1","Dnajb4","Dusp1","Dusp8","Egr1","Egr2","Eif1","Eif5","Erf","Errfi1","Fam132b",
+                          "Fos","Fosb","Fosl2","Gadd45a","Gadd45g","Gcc1","Gem","H3f3b","Hipk3","Hsp90aa1","Hsp90ab1","Hspa1a","Hspa1b","Hspa5","Hspa8",
+                          "Hspb1","Hspe1","Hsph1","Id3","Idi1","Ier2","Ier3","Ier5","Ifrd1","Il6","Irf1","Irf8","Itpkc","Jun","Junb","Jund","Kcne4","Klf2",
+                          "Klf4","Klf6","Klf9","Litaf","Lmna","Maff","Mafk","Mcl1","Midn","Mir22hg","Mt1","Mt2","Myadm","Myc","Myd88","Nckap5l","Ncoa7",
+                          "Nfkbia","Nfkbiz","Nop58","Nppc","Nr4a1","Odc1","Osgin1","Oxnad1","Pcf11","Pde4b","Per1","Phlda1","Pnp","Pnrc1","Ppp1cc","Ppp1r15a",
+                          "Pxdc1","Rap1b","Rassf1","Rhob","Rhoh","Ripk1","Sat1","Sbno2","Sdc4","Serpine1","Skil","Slc10a6","Slc38a2","Slc41a1","Socs3","Sqstm1",
+                          "Srf","Srsf5","Srsf7","Stat3","Tagln2","Tiparp","Tnfaip3","Tnfaip6","Tpm3","Tppp3","Tra2a","Tra2b","Trib1","Tubb4b","Tubb6","Ubc",
+                          "Usp2","Wac","Zc3h12a","Zfand5","Zfp36","Zfp36l1","Zfp36l2","Zyx")
+  dissociation_genes=dissociation_genes[!dissociation_genes %in% unique(included)];
+  C<-GetAssayData(object = data, slot = "counts"); 
+  dissa=unique(dissociation_genes); dissa=rownames(C[rownames(C) %in% dissa,]); 
+  disso <- colSums(C[dissa,])/Matrix::colSums(C)*100
+  data <- AddMetaData(data, disso, col.name = "percent_disso") #Mes=c('Mpz') #
+  
+  #Unrepresentative genes away:
+  data$log10GenesPerUMI <- log10(data$nFeature_RNA) / log10(data$nCount_RNA); #VlnPlot(data,features="log10GenesPerUMI")+  ggtitle("")
+  #Limits for molecule and gene detection, mitos, ribos, blood and HSPs:
+  nmin=round_any(quantile(data$nCount_RNA, p=0.05),100,f = ceiling)# 
+  nmax=round_any(quantile(data$nCount_RNA, p=0.99),100,f = ceiling)
+  a=quantile(data$nFeature_RNA[ data$nFeature_RNA<quantile(data$nFeature_RNA,0.25) ], p=0.5); b=sd((data$nFeature_RNA[ data$nFeature_RNA<quantile(data$nFeature_RNA,0.25) & !data$nFeature_RNA==0 ])) #179.3488
+  min=round(a+b,0);min2=ceiling(2/3*round(a+b,0))
+  a=quantile(data$nFeature_RNA[ data$nFeature_RNA>quantile(data$nFeature_RNA,0.95) ], p=0.5); b=sd((data$nFeature_RNA[ data$nFeature_RNA>quantile(data$nFeature_RNA,0.95) ])) #179.3488
+  max=round(a+b,0);max2=ceiling(5/3*round(a+b,0)) #4552 ->4600,
+  #pm=round(quantile(data$percent.mt, p=0.75)+2^sd(log2(data$percent.mt[!data$percent.mt==0]))) #sqrt(mean(data$percent.mt[!data$percent.mt==0])); a little bit too high compared to 2.7... and log2 ->ok
+  # logs are due to high variation, 2*sd(data$percent.mt[!data$percent.mt==0])~15, which is too much to add to mean, whereas log2 values smoothen the results..
+  # VlnPlot(data, features="percent.mt",  group.by='orig.ident')+  ggtitle(""); 
+  # median(data$percent.mt)+2*sd(data$percent.mt) close or quantile(data$percent.mt,0.75)+sd(data$percent.mt) 
+  pme=round(quantile(data$percent.mt[!data$percent.mt==0], p=0.75)+sqrt(mean(data$percent.mt[!data$percent.mt==0]))) #https://www.sciencedirect.com/topics/mathematics/poisson-distribution
+  # > median(data$percent.mt[!data$percent.mt==0])
+  # [1] 5.058491 (too low)
+  # > mean(data$percent.mt[!data$percent.mt==0])
+  # [1] 8.764324 (too low too)
+  # The 99-percent confidence interval is calculated as: λ ±2.58*sqrt(λ/n), not sure if needed here...
+  # pme=round(mean(data$percent.mt[!data$percent.mt==0])+2.58*sqrt(mean(data$percent.mt[!data$percent.mt==0])/length(data$percent.mt[!data$percent.mt==0])),4)
+  #pm2=round(quantile(data$percent.mt, p=0.9)+2^sd(log2(data$percent.mt[!data$percent.mt==0]))) #why log2 and power of 2? ... it was probably because the values were 'high'
+  pme2=round(quantile(data$percent.mt[!data$percent.mt==0], p=0.9)+sqrt(mean(data$percent.mt[!data$percent.mt==0])))
+  #lg=round(quantile(data$Percent.Largest.Gene, p=0.98)+2^sd(log2(data$Percent.Largest.Gene))) #8%; quantile(data$Percent.Largest.Gene, p=0.98)+2*sd(data$Percent.Largest.Gene) is higher...  yes..
+  lge=round(quantile(data$Percent.Largest.Gene[!data$Percent.Largest.Gene==0],p=0.98)+sqrt(mean(data$Percent.Largest.Gene[!data$Percent.Largest.Gene==0])),1)
+  #lg2=round(quantile(data$Percent.Largest.Gene, p=0.99)+2^sd(log2(data$Percent.Largest.Gene))) #8%
+  lge2=round(quantile(data$Percent.Largest.Gene[!data$Percent.Largest.Gene==0],p=0.99)+sqrt(mean(data$Percent.Largest.Gene[!data$Percent.Largest.Gene==0])),1)
+  rply=round(quantile(data$percent_ribo, p=0.98)); #rpsy=round(quantile(data$percent.Rps, p=0.99))
+  B=round(quantile(data[[]][,'percent.blood'],0.92),3); #VlnPlot(data, features="percent.blood",  group.by='orig.ident')+  ggtitle("")+ylim(2,20)  #split.by = "orig.ident",
+  # hsp1=round(quantile(data$percent.hsp, p=0.01),1);
+  hsp2=round(quantile(data$percent.hsp, p=0.99),1) #VlnPlot(data, features="HSP.score1",  group.by='orig.ident')+  ggtitle("")+ylim(-2,10)  #split.by = "orig.ident",
+  huussi=round(quantile(data$percent.house, p=0.99),1) #VlnPlot(data, features="House1",  group.by='orig.ident')+  ggtitle("")+ylim(0,100)  #split.by = "orig.ident",
+  linkki=round(quantile(data$percent.link, p=0.98),1)
+  dissen=round(mean(data$percent_disso[!data$percent_disso==0])+2*sd(data$percent_disso[!data$percent_disso==0]),3)  #normally distributed, so mean+2sd works here...
+  #Here was a mistake..dissen2=round(quantile(data$nFeature_RNA, p=0.98),1)
+  # VlnPlot(data,features="percent_disso")+  ggtitle("") #& ylim(0,10);
+  # https://www.nature.com/articles/s41467-021-27035-8#code-availability # https://github.com/egarren/scTfh# https://constantamateur.github.io/2020-10-24-scBatch2/# https://hbctraining.github.io/scRNA-seq/lessons/04_SC_quality_control.html
+  # Newest article 2022 about Ye et al....# > data #An object of class Seurat  #18881    features across 32700    samples within 1 assay #Active assay: RNA (18881 features, 0 variable features)
+  # data[c('Pitx2','Sox2'),] #Vielä on
+  
+  #The below will be needed for presentation purposes:
+  # VlnPlot(data, features = c("nFeature_RNA", "nCount_RNA", "percent.mt",'Percent.Largest.Gene',"log10GenesPerUMI",
+                             # "percent_ribo", "percent.blood","percent.link", 'percent.house',"percent_disso" ), ncol = 2,group.by='orig.ident')+  ggtitle("") #https://github.com/egarren/scTfh/blob/main/code/01_gex.R
+  # data=data1ok;
+  # min;max;nmin;nmax;0.78;pme;lge;dissen;linkki;rply;B;hsp2;huussi
+  
+  # VlnPlot(data, features = c("percent.hsp"), ncol = 1) 
+  
+  if (small!='yes') {data= subset(data, nFeature_RNA>min & nFeature_RNA < max & nCount_RNA>nmin & nCount_RNA<nmax & #check this..
+                                    log10GenesPerUMI > 0.78 & percent.mt < pme  & Percent.Largest.Gene < lge & percent_disso < dissen & #& percent.mt >  -Inf
+                                    percent.link < linkki & percent_ribo < rply & #percent_ribo > rpl & # percent.Rps < rpsy & & percent.Rps > rps & #percent.hb <hb & S.Score < S & G2M.Score< G & #hb is fused to 'percent.blood', which has other gens also
+                                    percent.blood < B & percent.hsp < hsp2 & percent.house<huussi)} else if (small=='yes')  #& percent.hsp > hsp1)# percent.hsp > hsp1  & b=5.97%) # check the scores...  perhaps excessive
+                        
+  {data= subset(data, nFeature_RNA>min2 & nFeature_RNA < max2  & percent.mt < pme2  & Percent.Largest.Gene < lge2)} #
+  # data[c('Pitx2','Sox2'),]
+
+# VlnPlot(data,features="percent_disso",group.by='orig.ident')+  ggtitle("") #& ylim(0,10);
+
+  # data_alt=data
+  
+  # Filter MALAT1, #tää voi lähteä sellasenaan.. ja
+  data <- data[!grepl("Malat1", rownames(data)), ]; data <- data[!grepl("Gm42418", rownames(data)), ];  data <- data[!grepl("AY036118", rownames(data)), ]
+  # Filter Gm42418 and AY036118, https://github.com/egarren/scTfh/blob/main/code/01_gex.R# #TCR and Ig identification and filtering
+  ig_list <- c("IG_C_gene", "IG_C_pseudogene", "IG_D_gene", "IG_D_pseudogene", "IG_J_gene", "IG_LV_gene","IG_pseudogene", "IG_V_gene", "IG_V_pseudogene")
+  tr_list <-c("TR_V_gene", "TR_V_pseudogene", "TR_D_gene", "TR_J_gene", "TR_J_pseudogene", "TR_C_gene")
+  data <- subset(data, features=rownames(data[!(data@assays[["RNA"]]@meta.features$gene_biotype %in% ig_list),])) #2 genes
+  data <- subset(data, features=rownames(data[!(data@assays[["RNA"]]@meta.features$gene_biotype %in% tr_list),])) #1 genes# sum(krts2 %in% rownames(data[is.na(data@assays[["RNA"]]@meta.features$mgi_symbol),])) #ok, i.e. 0, delete below:
+  # data[c('Pitx2','Sox2'),] #ok
+  
+  data <- subset(data, features=rownames(data[!(rownames(data) %in% hello),])) #https://adv-r.hadley.nz/subsetting.html#Mitot away:
+  # data[c('Pitx2','Sox2'),] #ok
+  data <- data[!grepl("^mt-", rownames(data)), ] #HSP genes away:
+  data <- subset(data, features=rownames(data[!(rownames(data) %in% HSP_genes),])) #also zero to epit #75 genes# #%%Ribot away
+  data <- data[!grepl("^Rp[sl]", rownames(data)), ]; data <- data[!grepl("Mrp[sl]", rownames(data)), ] #pattern ='^Rpl|^Rps|^Mrpl|^Mrps')#%%House away!
+  data <- subset(data, features=rownames(data[!(rownames(data) %in% house),])) #also zero to epit, sum(house %in% krts2n)#  #Cell cycle.. now looks better... # S=round(quantile(data[[]][,'S.Score'],0.999),3); G=round(quantile(data[[]][,'S.Score'],0.999),3) #on vielä
+  data = CellCycleScoring(data, s.features = str_to_title(cc.genes.updated.2019$s.genes), g2m.features = str_to_title(cc.genes.updated.2019$g2m.genes), set.ident = TRUE) #n = 21
+  # data[c('Pitx2','Sox2'),] #ok
+  # case='E14'
+  #Calculating droplets requires a function:
+  ax=function(data,urgency,case) {
+    #https://www.geeksforgeeks.org/convert-first-letter-of-every-word-to-uppercase-in-r-programming-str_to_title-function/
+    # https://stackoverflow.com/questions/1169388/finding-all-positions-for-multiple-elements-in-a-vector
+    # https://academic.oup.com/biomedgerontology/article/69/12/1437/592768
+    lista2<- SplitObject(data, split.by = "orig.ident"); #pituus2=c() #DataList #auxiliary for the doublets
+    #https://raw.githubusercontent.com/NBISweden/workshop-scRNAseq/master/labs/compiled/seurat/seurat_01_qc.Rmd#s, https://raw.githubusercontent.com/NBISweden/workshop-scRNAseq/master/labs/compiled/seurat/seurat_01_qc.Rmd
+    c= c();nw7=c();nameesa=c()
+    for(i in 1:length(lista2)) { #you need to have list_pa2 here (not lista2)
+      data.filt = FindVariableFeatures(lista2[[i]], verbose = F);
+      if (case=='E11') {vtr = c('percent_ribo','percent.blood',"G2M.Score","S.Score",'percent.house','percent.mt','percent.link','percent.hsp')} else vtr = c('percent.mt',"G2M.Score","S.Score",'percent.link','percent.hsp','percent.house')
+      data.filt = ScaleData(data.filt, vars.to.regress = vtr,verbose = F);
+      data.filt = RunPCA(data.filt, verbose = F, npcs = 22);
+      data.filt = RunUMAP(data.filt, dims = 1:15, verbose = F, n.neighbors = 23); # define the expected number of doublet cells:
+      # https://github.com/satijalab/seurat/issues/4312
+      nExp <- round(ncol(data.filt) * 0.05);  # expect 5/4% doublets, or more than smaller samples, https://raw.githubusercontent.com/NBISweden/workshop-scRNAseq/master/labs/compiled/seurat/seurat_01_qc.Rmd
+      data.filt <- NormalizeData(data.filt);
+      data.filt <- doubletFinder_v3(data.filt, pN = 0.25, pK = 0.09, nExp = nExp, PCs = 1:15); # name of the DF prediction can change, so extract the correct column name.
+      DF.name = colnames(data.filt@meta.data)[grepl("DF.classification", colnames(data.filt@meta.data))];
+      c=colnames(data.filt[, data.filt@meta.data[, DF.name] == "Singlet"]); nw7<-append(nw7,list(c))}
+    nameesa=unlist(nw7);james=c()
+    james=c(nameesa); james=unique(james); #
+    data=data[,james] #from https://rpubs.com/Mentors_Ubiqum/capture_output
+    return(data)}
+  if (small!='yes') {data=ax(data,urgency,case)};#data[c('Pitx2','Sox2'),]
+  return(data)}
+```
+
+
+# Filterings
+```{r, warning=FALSE,message=FALSE,fig.width=8.0}
+
+#E11 filtering
+data1a;data1a[c('Sox2','Pitx2','Shh'),] 
+DefaultAssay(data1a)='RNA';small='no'; gc(); memory.limit(9999999999999);
+data1aa=Pre_anal_process(data1a,small,case='E11',mart); 
+data1aa;data1aa[c('Sox2','Pitx2','Shh'),]  #did have pitx2 and sox2 in the end; ok
+name=paste('data_e11_big_filter',namedate,'.rds');saveRDS(data1aa, file = name)# data1a <- readRDS(file = ".../Corrected/E11/to/data_e11_big_filter_Tikka_17.5.23.rds")
+
+data2a;data2a[c('Sox2','Pitx2','Shh'),] 
+DefaultAssay(data2a)='RNA';small='no'; gc(); memory.limit(9999999999999);
+data2aa = Pre_anal_process(data2a,small,case='E11',mart);data2a; data2a[c('Sox2','Pitx2','Shh'),]
+data2aa;data2aa[c('Sox2','Pitx2'),]  #did have pitx2 and sox2 in the end
+name=paste('data_e14_big_filter_ok1',namedate,'.rds');saveRDS(data2aa , file = name) #data2a <- readRDS(file = "data_e14_big_filter_ok1 Tikka 5.7.23 .rds")
+# DefaultAssay(data2b)='RNA'; small='no'; gc(); memory.limit(9999999999999); #note that this dataset is not small...
+# data2b=Pre_anal_process(data2b,small,case='E11',mart); data2b; data2b[c('Sox2','Pitx2'),] # https://github.com/satijalab/seurat/issues/4803, https://github.com/satijalab/seurat/issues/5563
+
+#E16 filtering, Before filter
+
+data3;data3[c('Sox2','Pitx2','Shh'),] 
+DefaultAssay(data3)='RNA';small='no'; gc(); memory.limit(9999999999999);
+data3aa = Pre_anal_process(data3,small,case='E16',mart);data3aa; data3aa[c('Sox2','Pitx2','Shh'),]#
+name=paste('data_e16_big_filter_ok1',namedate,'.rds');saveRDS(data3 , file = name) 
+
+
+
+#For this you need to have Datalist, data, the name for saving, and mc for number of cell in minimum sample (if less than 100, and if above then 100)
+# DefaultAssay(data1a) <- "RNA";DataList1 <- SplitObject(data1a, split.by = "orig.ident") #DataList is made from the filtered data, but check manually if any of the sets are less than 80 cells
+# DefaultAssay(data1b) <- "RNA";DataList2 <- SplitObject(data1b, split.by = "orig.ident")
+# DefaultAssay(data2a) <- "RNA";DataList2 <- SplitObject(data2a, split.by = "orig.ident") #DataList is made from the filtered data, but check manually if any of the sets are less than 80 cells
+# DefaultAssay(data2b) <- "RNA";DataList2 <- SplitObject(data2b, split.by = "orig.ident")
+# DefaultAssay(data22) <- "RNA";DataList1 <- SplitObject(data22, split.by = "orig.ident") #DataList is made from the filtered data, but check manually if any of the sets are less than 80 cells
+# DefaultAssay(data3)  <- "RNA";DataList3 <- SplitObject(data3, split.by = "orig.ident")
+
+
+
+#This works for E11 and E14:
+# mc=100#min cell number, sample 1 and 2
+# date1=Transform1(DataList1,mc,case='E14') #Check your case.. #Needs to be regressed at least: "G2M.Score","S.Score",percent.mt,percent.link
+#this is now second version of the total merge... with transfrom2 and filter to two experiments otherwise differently
+# date1[[1]]; date1[[2]]; date1[[3]]; date1o=date1[[1]];date1o; date1o[c('Sox2','Pitx2'),]
+```
+
+
+# Computational Analysis Functions
+```{r, warning=FALSE,message=FALSE,fig.width=8.0}
+
+# The preprosessing and initial scRNAseq analysis (i.e. the umaps) functions
+
+# This is a gene & cell filtering function needed before analyses# The input of this function is your merged seurat object and name for saving it and output the filtered (and saved) seurat data object (+image) ready for normalization: Ok denotes the good sample numbers
+# This excludes cells expressing an unwanted gene with a wanted percentile# The smaller the percentile, the more the unwanted gene you have excluded and more included the wanted ones
+Ex_nam=function(pb22,gene,percentile,assay) {
+  DefaultAssay(pb22) <- assay
+  x=GetAssayData(subset(x = pb22, features = c(gene)));
+  x=as.double(x);#names(x)=håj
+  x2 <- as.numeric(x); if (assay=='RNA') {print(table(x2))}
+  print(c(min(x2), max(x2), median(x2), mean(x2),quantile(x2,percentile)))
+  hist(x2, xlim=c(min(x2),quantile(x2,0.99)),breaks=200);
+  lep=quantile(x2,percentile); lep
+  x2=x[x <= lep]; houm=names(x2);toInclude <- houm;
+  print(c(sum(colnames(pb22) %in% toInclude)))
+  pb22a <- pb22[,colnames(pb22) %in% toInclude]
+  houm2=colnames(pb22a)
+  DefaultAssay(pb22) <- "RNA"
+  return(houm2)}
+
+In_nam=function(mes1,gene,percentile,assay) {
+  DefaultAssay(mes1) <- assay; #gene='Msx1'; percentile=0.5;assay='RNA'; 
+  x=GetAssayData(subset(x = mes1, features = c(gene)));
+  x=x[, colSums(x !=  min(x) ) >  min(x) ]
+  x2 <- as.numeric(x); if (assay=='RNA') {print(table(x2))} else if (assay=='SCT') {print(table(x2))}
+  print(c(min(x2), max(x2), median(x2), mean(x2),quantile(x2,percentile)))
+  hist(x2, xlim=c(min(x2),quantile(x2,0.9)),breaks=200);
+  lep=quantile(x2,percentile); lep
+  x2=x[x >= lep]; houm=names(x2);toInclude <- houm;
+  print(c(sum(colnames(mes1) %in% toInclude)))
+  mes1a <- mes1[,colnames(mes1) %in% toInclude]
+  houm2=colnames(mes1a)
+  return(houm2)}
+
+#Transform at least work with bigger gene amount; #https://satijalab.org/seurat/reference/integratedata, https://satijalab.org/seurat/reference/findintegrationanchors
+##Tested with small number of genes, since this method does not have PC amount, and it did go through.. (if oke is loke and)
+Transform1 <- function(DataList,mc,case='E11') {
+  #https://github.com/satijalab/seurat/issues/1528#scale should be ok: https://github.com/satijalab/seurat/issues/1708
+  hap=c(); for(i in 1:length(DataList)) {pata=DataList[[i]]; tap1a=round_any(dim(pata)[1]*0.33, 100,f = ceiling); hap=append(hap,tap1a)
+  pb1=NormalizeData(pata, normalization.method = "LogNormalize", scale.factor = 10000) #scale should be ok: https://github.com/satijalab/seurat/issues/1708
+  teg=c(5,20,50,100,500,1000,2000,3000,4000,5000,6000,8000,10000,13000); na<-c()
+  for(i in 1:12) {ob1=FindVariableFeatures(object = pb1, selection.method = "mvp",num.bin=teg[i]); var1=length(VariableFeatures(object = ob1)); var1; na<-append(na,var1)}} 
+  tap1=round_any(median(na)*1.1, 10,f = ceiling); tp1=round_any((tap1*3+median(hap)*2)/5, 100,f = ceiling)  
+  # https://github.com/satijalab/seurat/issues/3061#https://satijalab.org/seurat/articles/integration_rpca.html https://github.com/satijalab/seurat/issues/3061 ...
+  if (case=='E11') {vtr = c('percent_ribo','percent.blood',"G2M.Score","S.Score",'percent.house','percent.mt','percent.link','percent.hsp')} else #,'percent.mt'
+    vtr = c("G2M.Score","S.Score",'percent.mt','percent.link','percent.house') #'percent.mt',"G2M.Score","S.Score",'percent.link','percent.hsp','percent.house'
+  DataList <- lapply(X = DataList, FUN = SCTransform,vst.flavor="v2",vars.to.regress = vtr, variable.features.n = tp1,method = "glmGamPoi")#this is about 5-10min (second slowests)
+  features <- SelectIntegrationFeatures(object.list = DataList, nfeatures = tp1); 
+  DataList <- PrepSCTIntegration(object.list = DataList, anchor.features = features);gc();#mc=100
+  anchors <- FindIntegrationAnchors(object.list = DataList,normalization.method = "SCT",anchor.features = features);gc(); #This is the slowest, 10-30min depending on samples and method (or longer!)
+  combined <- IntegrateData(anchorset = anchors, normalization.method = "SCT",k.weight = mc) #this lasts around 3-5min (thirds slowest); even though it is fast it could crash if mc is high
+  datajei=combined;
+
+  #Not ok like this for Shh and Sox2:
+  #https://github.com/satijalab/seurat/issues/1528#scale should be ok: https://github.com/satijalab/seurat/issues/1708
+  # DataList=DataList1
+  # # https://github.com/satijalab/seurat/issues/3061#https://satijalab.org/seurat/articles/integration_rpca.html https://github.com/satijalab/seurat/issues/3061 ...
+  # if (case=='E14') {vtr = c('percent_ribo','percent.blood',"G2M.Score","S.Score",'percent.house','percent.mt','percent.link','percent.hsp')} else {vtr = c("G2M.Score","S.Score",'percent.mt','percent.link','percent.house')}
+  # DataList <- lapply(X = DataList, FUN = SCTransform,vst.flavor="v2",vars.to.regress = vtr, variable.features.n = 8000,method = "glmGamPoi")#this is about 5-10min (second slowests)
+  # # for (i in 1:4) {DataList[[i]] <- SCTransform(DataList[[i]], vst.flavor="v2",
+  # # vars.to.regress = vtr, residual.features = 
+  # # unique(c(VariableFeatures(DataList[[i]]),'Sox2','Shh','Pitx2')),method = "glmGamPoi")}
+  # # if (case=='E11') {namesa=c(VariableFeatures(DataList[[1]]),'Sox2','Shh','Pitx2')
+  # # DataList <- lapply(X = DataList, FUN = SCTransform,vst.flavor="v2",vars.to.regress = vtr, residual.features = namesa,method = "glmGamPoi")}
+  # features <- SelectIntegrationFeatures(object.list = DataList, nfeatures = tp1); 
+  # # features=unique(c(features,'Sox2','Shh','Pitx2')) # you need to add your genes of interest here
+  # sum(features=='Sox2'); sum(features=='Shh')
+
+  return(c(datajei,tp1,tap1))}#'percent.hsp',
+
+Transform2 <- function(DataList,mc) { #This does not have any variables to regress, which is probably not ok...
+  #https://github.com/satijalab/seurat/issues/1528#scale should be ok: https://github.com/satijalab/seurat/issues/1708
+  
+  DataList=DataList1
+  hap=c(); for(i in 1:length(DataList)) {pata=DataList[[i]]; tap1a=round_any(dim(pata)[1]*0.33, 100,f = ceiling); hap=append(hap,tap1a)
+  pb1=NormalizeData(pata, normalization.method = "LogNormalize", scale.factor = 10000) #scale should be ok: https://github.com/satijalab/seurat/issues/1708
+  teg=c(5,20,50,100,500,1000,2000,3000,4000,5000,6000,8000,10000,13000); na<-c()
+  for(i in 1:12) {ob1=FindVariableFeatures(object = pb1, selection.method = "mvp",num.bin=teg[i]); var1=length(VariableFeatures(object = ob1)); var1; na<-append(na,var1)}} 
+  tap1=round_any(median(na)*1.1, 10,f = ceiling); tp1=round_any((tap1*3+median(hap)*2)/5, 100,f = ceiling)  
+  # https://github.com/satijalab/seurat/issues/3061#https://satijalab.org/seurat/articles/integration_rpca.html https://github.com/satijalab/seurat/issues/3061 ...
+  DataList <- lapply(X = DataList, FUN = SCTransform,vst.flavor="v2", variable.features.n = tp1,method = "glmGamPoi");  #this is about 5-10min (second slowests)
+  features <- SelectIntegrationFeatures(object.list = DataList, nfeatures = tp1); 
+  DataList <- PrepSCTIntegration(object.list = DataList, anchor.features = features);gc();#mc=100
+  anchors <- FindIntegrationAnchors(object.list = DataList,normalization.method = "SCT",anchor.features = features);gc(); 
+  #This is the slowest, 10-30min depending on samples and method (or longer!)
+  combined <- IntegrateData(anchorset = anchors, normalization.method = "SCT",k.weight = mc) #this lasts around 3-5min (thirds slowest); even though it is fast it could crash if mc is high
+  datajei=combined;
+  return(c(datajei,tp1,tap1))}
+
+Merge_Norm = function(vari,regout='mito',PC='ok',res='ok') { #regout: (mito, phase, both), PC&res (if ok then default) else insert number
+  # regout='mito';PC='ok';res='ok'
+  tap1a=round_any(dim(vari)[1]*0.33, 100,f = ceiling)
+  pb1=NormalizeData(vari, normalization.method = "LogNormalize", scale.factor = 10000) #scale should be ok: https://github.com/satijalab/seurat/issues/1708
+  ob1=FindVariableFeatures(object = pb1, selection.method = "mvp",num.bin=20); var1=length(VariableFeatures(object = ob1)); #var1 times 1.2 or 1.1 etc., num.bin=20 on std 3000 max
+  tap1=round_any(var1*1.1, 10,f = ceiling); tp1=round_any((tap1*3+tap1a*2)/5, 100,f = ceiling)
+  if (regout=='mito') {vtr = c('percent.mt')} else if (regout=='phase') {vtr = c("G2M.Score","S.Score")} else if (regout=='both') {vtr = c('percent.mt',"G2M.Score","S.Score")}
+  vari[["percent.mt"]] <- PercentageFeatureSet(vari, pattern = "^mt-") #the mitos have already been filtered..VlnPlot(vari,features="percent.mt")+  ggtitle("")
+  vari = CellCycleScoring(vari, s.features = str_to_title(cc.genes.updated.2019$s.genes), g2m.features = str_to_title(cc.genes.updated.2019$g2m.genes), set.ident = TRUE) #n = 21
+  vari <- SCTransform(vari,variable.features.n = tp1,method = "glmGamPoi",vst.flavor="v2",vars.to.regress = vtr) #vars.to.regress = c('percent.mt',"G2M.Score","S.Score"
+  vari <- vari[!grepl("^mt-", rownames(vari)), ]
+  DefaultAssay(vari) <- "SCT"
+  vari <- RunPCA(vari, features = VariableFeatures(object = vari))
+  ElbowPlot(object = vari, ndims = 50); pct <- vari[["pca"]]@stdev / sum(vari[["pca"]]@stdev) * 100; cumu <- cumsum(pct)
+  co1 <- which(cumu > 90 & pct < 5)[1];co2 <- sort(which((pct[1:length(pct) - 1] - pct[2:length(pct)]) > 0.1), decreasing = T)[1] + 1
+  pcs <- min(co1, co2);co1;co2;pcs
+   data.frame(pct = pct,cumu = cumu,rank = 1:length(pct)); plot_df <-ggplot(plot_df, aes(cumu, pct, label = rank, color = rank > pcs)) + geom_text() + geom_vline(xintercept = 99, color = "grey") + geom_hline(yintercept = min(pct[pct > 1]), color = "grey") + theme_bw()
+  print(plot_df); png("PCs in elbow.png", width = 9000, height = 9000,pointsize = 16, res=1200);print(plot_df);dev.off() 
+  if (PC=='ok') {z=pcs} else if (PC!='ok') {z=PC}; if (res=='ok') {res=0.5} else if (res!='ok') {res=res};
+  vari <- FindNeighbors(vari, dims = 1:z); 
+  vari <- FindClusters(vari, resolution = res) #for rishis ref/a you get 8 clusters with 0.15 resolution which needs to be checked against monocle3 pseudotime so that you do not get loops, 0.2-0.8
+  vari <- RunUMAP(vari, dims = 1:z,return.model=TRUE)#This runs like a minute...
+  cal=0:(dim(table ( Idents( vari) ))-1); cyl=1:dim(table ( Idents( vari) ));current.cluster.ids <- cal; new.cluster.ids <- cyl;vari@active.ident <- plyr::mapvalues(x =  vari@active.ident , from = current.cluster.ids, to = new.cluster.ids);
+  vari$seurat_clusters <- plyr::mapvalues(x =  vari$seurat_clusters , from = current.cluster.ids, to = new.cluster.ids);
+  printe=DimPlot( data, reduction = "umap",pt.size = 1, label = TRUE, label.size = 7,group.by = 'seurat_clusters');dev.off()
+  print(printe);jpeg("Clusters in UMAP.png", width = 12000, height = 12000, pointsize = 16, res=1200);print(printe);dev.off()
+  return(c(vari,z))}
+
+#If you know that you have e.g. one epithelial cluster and one mesenchymal cluster, you could aim to see those by changing the below variables...
+Cluster_iteration = function (data,PC,rs,cond) {
+  data <- RunPCA(data, npcs=50,verbose = FALSE); #I have not used more than 50 pcs
+  ElbowPlot(object = data, ndims = 50)
+  pct <- data[["pca"]]@stdev / sum(data[["pca"]]@stdev) * 100
+  cumu <- cumsum(pct); co1 <- which(cumu > 90 & pct < 5)[1]
+  co2 <- sort(which((pct[1:length(pct) - 1] - pct[2:length(pct)]) > 0.1), decreasing = T)[1] + 1
+  pcs <- min(co1, co2);co1;co2;pcs
+  plot_df <- data.frame(pct = pct,cumu = cumu,rank = 1:length(pct))
+  printa=ggplot(plot_df, aes(cumu, pct, label = rank, color = rank > pcs)) + geom_text() + geom_vline(xintercept = 99, color = "grey") + geom_hline(yintercept = min(pct[pct > 1]), color = "grey") +theme_bw();
+  print(printa); png("PCs in elbow.png", width = 9000, height = 9000,pointsize = 16, res=1200);print(printa);dev.off() #olipas haasteellista;https://www.programiz.com/r/print-output
+  #14 was perhaps too low I think, and from 19... starts clearly uniform
+  if (PC=='Default') {z=pcs} else if (cond=='big') {if (pcs<27) {z=pcs+round(pcs*0.5)+5} else {z=pcs+3}} else {z=PC}
+  #this defines much of the shape.. if you are expecting low numbers of clusters, this should be low, or in the beginning
+  data <- RunUMAP(data, dims = 1:z,return.model=TRUE) #seed.use = saved.seed, huom. without seed.use estimate, basically no matter,
+  data <- FindNeighbors(data, dims = 1:z) #  data@meta.data= data@meta.data[, c(1:15)]
+  if (rs=='Default') {res=0.5} else if (rs=='big') {if (z<90) {res=0.4+round(z/80,2)} else if (z >= 90 ) {res=1.5}} else {res=rs}#divides the shape to smaller or bigger pieces:
+  data <- FindClusters(data, resolution = res) #0.5//0.7/0.8/1 is good for pseudo check the final resolution for clustera and also from above 'hei',
+  cal=0:(dim(table ( Idents( data) ))-1); cyl=1:dim(table ( Idents( data) ));current.cluster.ids <- cal; new.cluster.ids <- cyl; #or e.g.:
+  data@active.ident <- plyr::mapvalues(x =  data@active.ident , from = current.cluster.ids, to = new.cluster.ids);
+  data$seurat_clusters <- plyr::mapvalues(x =  data$seurat_clusters , from = current.cluster.ids, to = new.cluster.ids);# 'https://github.com/bicciatolab/popsicleR/blob/main/R/popsicleR.R'
+  printe=DimPlot( data, reduction = "umap",pt.size = 1, label = TRUE, label.size = 7,group.by = 'seurat_clusters');dev.off() #group.by = 'seurat_clusters', SCT_snn_res.0.3
+  print(printe);jpeg("Clusters in UMAP.png", width = 12000, height = 12000, pointsize = 16, res=1200);print(printe);dev.off()
+  return(c(data,z))}
+
+dispersion_removal=function(vari) {
+  doni=c(); varin=vari
+  clusta=length(table ( Idents( varin) ))
+  DimPlot(varin,reduction="umap",pt.size = 1.5, label = TRUE, label.size = 7, group.by = 'seurat_clusters', order=FALSE) #Check the names...
+  varin@meta.data=varin@meta.data[,1:28] #Check this..
+  head(varin@meta.data)
+  xlt=c();ylt=c()
+  for (i in 1:clusta) {
+    m3=subset(x = vari, idents = c(i))
+    xm=ceiling(mean(m3@reductions$umap[[,1]]))
+    ym=ceiling(mean(m3@reductions$umap[[,2]]))
+    xl1=ceiling(sd(m3@reductions$umap[[,1]])*2.5)/2*1.05
+    yl1=ceiling(sd(m3@reductions$umap[[,2]])*2.5)/2*1.05
+    xlt=append(xlt,xl1); ylt=append(ylt,yl1)
+    m33=m3[,m3@reductions$umap[[,1]]>(xm+xl1) | m3@reductions$umap[[,1]]<(xm-xl1)]
+    m33b=m3[,m3@reductions$umap[[,2]]>(ym+yl1) | m3@reductions$umap[[,2]]<(ym-yl1)] #just check that clusta is high..# tryCatch( m33=m3[,m3@reductions$umap[[,1]]>(xm+xl1) | m3@reductions$umap[[,1]]<(xm-xl1)],# warning = function(w) {print(paste("No cells in cluster", i))}, error = function(e) { next })
+    tot=unique(c(colnames(m33),colnames(m33b)))
+    doni=append(doni,tot)}
+  xmv=c();ymv=c()
+  for (i in 1:clusta) {
+    m3=subset(x = vari, idents = c(i))
+    xm=ceiling(mean(m3@reductions$umap[[,1]]))
+    ym=ceiling(mean(m3@reductions$umap[[,2]])) #two times the same thing...
+    xmv=append(xmv,xm);ymv=append(ymv,ym) }
+  varin=vari
+  varin@meta.data=varin@meta.data[,1:28] #check this...
+  va1=dim(varin@meta.data)[2]+1
+  va2=dim(varin@meta.data)[2]+2
+  varin@meta.data[,va1:va2]=varin@reductions$umap[[,1:2]]
+  varin@meta.data[,va1:va2]=varin@reductions$umap[[,1:2]] 
+  colnames(varin@meta.data)[va1] = 'UMAP_1'
+  colnames(varin@meta.data)[va2] = 'UMAP_2'
+  cluste=c(); #jups=data.frame()# Defining euclidean distance between two points
+  euc.dist <- function(x1, x2) sqrt(sum((x1 - x2) ^ 2))
+  for (i in 1:clusta) {
+    for (j in 1:length(doni)) {
+      pt1 <- varin@meta.data[colnames(varin) %in% doni,c('UMAP_1','UMAP_2','seurat_clusters')][j,1:2]# Defining the point 2 with x = 4 and y=1
+      pt2 <- data.frame(x = xmv[i],y = ymv[i]); dist<- euc.dist(pt1,pt2); cluste=append(cluste,dist)}} # Calculating euclidean distance.. if you have many datapoints, this will take some time, 14:47-14:51 (for 1600 cells)
+  nexus=array(cluste, dim = c(length(doni), clusta)); 
+  nexus=data.frame(nexus); colnames(nexus)=1:clusta; # nexus[1:10,1:7]
+  zap=c(); for (i in 1:length(doni)) {zap=append(zap,colnames(nexus)[nexus[i,]==min(nexus[i,])])} #these are the closest cells
+  varin@meta.data[colnames(varin) %in% doni, c('seurat_clusters')]=as.numeric(zap) #this is not happening sometimes because of the below line:
+  #varin$seurat_clusters =factor(x = Idents(varin), levels = 1:clusta) #this may or may not be needed...far from obvious, but was done app.r as: https://github.com/satijalab/seurat/issues/1697, https://mojaveazure.github.io/seurat-object/reference/Idents.html
+  # table(varin$seurat_clusters) # vari2 <- subset(x = varin, idents = 1:13)
+  DimPlot(varin, label = TRUE, label.size = 7,pt.size = 3,group.by = 'seurat_clusters') #+ xlim(-11,-2)#+ xlim(-4,4)+ylim(7,9)+ ggtitle("") #remember to add group.by = 'seurat_clusters' or Sub_cluster
+  return(varin)}
+
+```
+
+
+# Execution of Preprocessing and Initial Analysis
+```{r, warning=FALSE,message=FALSE,fig.width=8.0}
+
+#For this you need to have Datalist, data, the name for saving, and mc for number of cell in minimum sample (if less than 100, and if above then 100)
+DefaultAssay(data1aa) <- "RNA"; DataList1 <- SplitObject(data1aa, split.by = "orig.ident") #DataList is made from the filtered data, but check manually if any of the sets are less than 80 
+DefaultAssay(data2aa) <- "RNA"; DataList2 <- SplitObject(data2aa, split.by = "orig.ident") #DataList is made from the filtered data, but check manually if any of the sets are less than 80 
+DefaultAssay(data3aa)  <- "RNA"; DataList3 <- SplitObject(data3aa, split.by = "orig.ident")
+
+#This is where you want to save the whole environment, unless you want to do the loading and processing every time, which is like 15min per stage, i.e. like 1h
+# save.image("C:/Users/patati/Desktop/TurkuOW/RWork/all.RData")
+# load("C:/Users/patati/Desktop/TurkuOW/RWork/all.RData")
+
+#This works for E11 and E14:
+mc=100#min cell number, sample 1 and 2
+date1=Transform1(DataList1,mc,case='E11') #Check your case.. #Needs to be regressed at least: "G2M.Score","S.Score",percent.mt,percent.link
+#this is now second version of the total merge... with transfrom2 and filter to two experiments otherwise differently
+date1[[1]]; date1[[2]]; date1[[3]]; 
+Data1=datajei # or of course...date1[[1]]; 
+Data1[c('Sox2','Pitx2'),]
+name=paste('E11.5_int_ok',namedate,'.rds'); saveRDS(Data1, name) #check the name..
+
+# date1o <- readRDS(file = "E14.25_int_ok1_big1 Tikka 5.7.23 .rds")
+if ((min(table(data2a$orig.ident))-1)>100) {mc=100} else mc=min(table(data2a$orig.ident))-1;mc #min cell number -1 or more... # 
+date2=Transform1(DataList2,mc,case='E14')
+date2[[1]]; date2[[2]]; date2[[3]]; Data2=date2[[1]]
+name=paste('E14.25_int_ok',namedate,'.rds'); saveRDS(Data2, name)
+
+#For E16,#this is probably ok:
+DefaultAssay(data3)  <- "RNA";
+mc=100 #Check from DataList
+date3=Transform1(DataList3,mc, case='E16')
+date3[[1]]; date3[[2]]; date3[[3]]; Data3=date3[[1]]
+name=paste('E16.5_int_ok',namedate,'.rds'); saveRDS(Data3, name) #check the name..
+
+
+
+
+
+```
+
+
+# Execution of Initial Analysis
+```{r, warning=FALSE,message=FALSE,fig.width=8.0}
+
+DefaultAssay( Data3) <- "integrated"
+PC='Default'; cond='no'; rs=0.7;latex=c();  #Default, or 0.7 or 1.07 produces the smaller nub '18', but 1.05/6.. not or 2-10 #2.4 ->10"
+latex=Cluster_iteration(Data1,PC,rs,cond) #Check if it is data or data1 or data2 etc.
+Data1=latex[[1]]; latex[[2]] #This is the combined epithelia!
+
+# Visualization is separately, but this is here as a part of quality control, you need to have also the genes of interest Pitx2 shown in the umaps:
+# DimPlot(Data1,reduction="umap",pt.size = 2, label = TRUE, label.size = 7,group.by = 'seurat_clusters');
+# DefaultAssay( Data1) <- "integrated"; vars=c('Pitx2','Acta2','Cdh5','Vim');
+# FeaturePlot(Data1, features = vars,cols = c("#c0c0c0",'red'),pt.size = 1,order=TRUE,min.cutoff=0,ncol=4, split.by=NULL)
+# DefaultAssay( Data1) <- "RNA"; vars=c('Sox2','Shh');
+# FeaturePlot(Data1, features = vars,cols = c("#c0c0c0",'red'),pt.size = 1,order=TRUE,min.cutoff=0,ncol=4, split.by=NULL)
+
+# This is again a place where you want to save the whole environment, unless you want to do the loading and processing every time, which is like 15min per stage, i.e. like 1h
+save.image("C:/Users/patati/Desktop/TurkuOW/RWork/all.RData")
+# load("C:/Users/patati/Desktop/TurkuOW/RWork/all.RData")
+# saveRDS(Data1, file = paste('E11.25_PCt',namedate,'.rds')) # datto2 = readRDS(file = "E11.5_double int_r0.15_pc8_ptt30323.rds")
+# saveRDS(Data2, file = paste('E14.5_PCt',namedate,'.rds')) # datto2 = readRDS(file = "E11.5_double int_r0.15_pc8_ptt30323.rds")
+# saveRDS(Data3, file = paste('E16.5_PCt',namedate,'.rds')) # datto2 = readRDS(file = "E11.5_double int_r0.15_pc8_ptt30323.rds")
+# And of course the loading
+# Data1=readRDS("C:/Users/patati/Documents/GitHub/scRNAseq_data_analysis/E11.25_PCt tikka011024 .rds")
+# Data2=readRDS("C:/Users/patati/Documents/GitHub/scRNAseq_data_analysis/E14.5_PCt tikka011024 .rds")
+# Data3=readRDS("C:/Users/patati/Documents/GitHub/scRNAseq_data_analysis/E16.5_PCt tikka011024 .rds")
+
+
+
+
+```
+
+
+# Visualizations
+```{r, warning=FALSE,message=FALSE,fig.width=8.0}
+#Pauli Tikka, scRNAseq Seurat analysis pipeline for 10X data, ver 4.6.2021 enhanced in 7.2.2022, and re-enhanced in 30224.
+#The idea of re-enhancing is to take doublet and dendogram clusterings (see:# https://raw.githack.com/bicciatolab/popsicleR/main/docs/popsicleR_tutorial.html
+# https://www.singlecellcourse.org/) and compile other analysis made earlier in a single file  .# https://bookdown.org/ytliu13207/SingleCellMultiOmicsDataAnalysis
+#https://stackoverflow.com/questions/47295443/r-install-package-loaded-namespace
+
+#1) Set the working directory and load the data.. in other folder... 'preparing the data' (11.5.23)
+#it is good to put one data 'type' as a folder:
+#https://github.com/satijalab/seurat/issues/1528 #this is relatively ok, but some cells are in other clusters than thier own e.g. 5 and 10
+
+# Global Variables:
+# ok='D:/Data for Seurat Analysis/filtered_gene_bc_matrices/Data Filtered and Processed in Seurat/Corrected/E14/new2'; setwd(dir=ok)#o
+# E11.5_big_ok Tikka 15.5.23 .rds
+# E14.25_6v_3500g_11p_.2r_20n_.1d_cut Tikka 18.7.23 .rds
+# E16.5_big_ok Tikka 19.7.23 .rds
+vari=Data1#readRDS('E11.5_big_ok Tikka 15.5.23 .rds')# head(colnames(vari@assay$RNA@counts)) #or epim or... check this(!)
+DimPlot(vari, label = TRUE, label.size = 7,pt.size = 1,group.by = 'seurat_clusters',order=FALSE) #+ xlim(-11,-2)#+ xlim(-4,4)+ylim(7,9)+ ggtitle("") #remember to add group.by = 'seurat_clusters' or Sub_cluster
+data=vari; DefaultAssay( data) <- "SCT";  data@active.ident =data$seurat_clusters #!!
+clusta=length(table ( Idents( data) )); options(scipen = 999);clusta
+gc(); memory.limit(9999999999999);
+
+# Näillä selviää Monocle Pseudotimen alku: #https://sib-swiss.github.io/single-cell-training/2021.11/day3/trajectory_analysis/
+
+# vari=vari3
+# ok='C:/scRNAseq_old_HKI/E11 clusters/'; setwd(dir=ok) #ok='F:/hepa2/';
+# ok='C:/scRNAseq_old_HKI/E14 clusters/'; setwd(dir=ok)
+# ok='C:/scRNAseq_old_HKI/E16 clusters/'; setwd(dir=ok)
+
+DefaultAssay(vari) <- 'RNA' #check..."SCT"; #vari=vari; # vari=mes3a; c('Pitx2','Sox2','Shh','Acta2') #'Vim','Msx1'
+nmj='Total' ; 
+vars=c('Pitx2','Sox2','Shh','Acta2','Cdh5','Fgf8','Krt14','Bmp4','Wnt10a'); #krt5...
+width = 10000*1.08; height = 10000;cols = c('green','red', 'blue','black','orange', 'yellow'); 
+vars2=c('Bmp4','Fgf8','Fgf9','Pitx1','Pitx2','Wnt10a','Wnt7b','Wnt4','Shh','Dlx5','Msx1','Msx2','Barx1')
+#CHECK X AND YLIMS!!! -> &  xlim(-6,9) & ylim(-7,6)
+hopl=FeaturePlot(vari, reduction = "umap",features = vars[1],pt.size = 2, order=T,cols = c("#c0c0c0",'red'),min.cutoff=0.5,ncol=1); 
+minMax(hopl$data$UMAP_1,maxDecimals = 2); minMax(hopl$data$UMAP_2,maxDecimals = 2)
+xmi=unlist(strsplit(minMax(hopl$data$UMAP_1,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[1];xmi=floor(as.numeric(xmi))
+xma=unlist(strsplit(minMax(hopl$data$UMAP_1,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[2];xma=ceiling(as.numeric(xma))
+ymi=unlist(strsplit(minMax(hopl$data$UMAP_2,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[1];ymi=floor(as.numeric(ymi))
+yma=unlist(strsplit(minMax(hopl$data$UMAP_2,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[2];yma=ceiling(as.numeric(yma))
+xmi;xma;ymi; yma #check that these are ok
+a=xlim(xmi,xma); b=ylim(ymi, yma)
+FeaturePlot(vari, reduction = "umap", features = vars[1],pt.size = 2, order=T,cols = c("#c0c0c0",'red'),min.cutoff=1,ncol=1) & a  & b & NoLegend();#dev.off() + ggtitle('') # a=xlim(-13,-1.75); b=ylim(-6,5.25) 
+# jpeg(paste("UMAPs",nmj, "_Primary Genes.jpg"), width = width, height = height, quality = 100,pointsize = 16, res=1200);#quality = 100,
+# FeaturePlot(vari, reduction = "umap",features = vars,cols = c("#c0c0c0",'red'),pt.size = 1.5, order=TRUE,ncol=3, min.cutoff = 1)& a  & b & NoLegend();dev.off()
+jpeg(paste("UMAP_Clusters", nmj, '.jpg'), width = width, height = height, quality = 100,pointsize = 14, res=1200);#,'orange', 'yellow #https://statisticsglobe.com/change-font-size-of-ggplot2-plot-in-r-axis-text-main-title-legend
+# label order: E14_epit$seurat_clusters <- factor(E14_epit$seurat_clusters, levels = c(1:5)) 
+DimPlot( vari, reduction = "umap",pt.size = 2, label = TRUE, label.size =10.5 ,group.by = 'seurat_clusters',order=TRUE) +ggtitle('') +  
+  theme(axis.title = element_text(size = 10.5)) + theme(legend.text = element_text(size = 10.5)) + guides(colour = guide_legend(override.aes = list(size=10.5))) & a  & b;dev.off()
+table(vari$orig.ident);table(vari$seurat_clusters)
+#Just to get the scale to the primary genes:
+DefaultAssay(vari)='RNA'#'SCT'; #RNA gives small Pitx2 values so use SCT here as well as with ScaleData below
+pb11a <- ScaleData(vari,features = rownames(vari),assay='RNA') #or SCT... This is better! ; #If you do not get any individual gene hits with SCT assay, RNA assay and scaling might help with heatmap plotting..
+pb11a@meta.data$seurat_clusters <- droplevels(pb11a@meta.data$seurat_clusters)
+jei=GetAssayData(pb11a, slot = c("data"));
+vr11=t(apply(jei, 1, function(x)(x-min(x))/(max(x)-min(x))));vr11=3*vr11
+pb11a <- SetAssayData(pb11a, slot = "scale.data", new.data = vr11)
+jpeg(paste("UMAPs",nmj, "_Primary Genes.jpg"), width = width, height = height, quality = 100,pointsize = 1, res=1200); #width = 12000, height = 9700, CHECK X AND YLIMS!!!
+prt=FeaturePlot(pb11a, slot='data',reduction = "umap",features = vars,cols = c("#c0c0c0",'red'),pt.size = 1.5, order=TRUE,ncol=3, min.cutoff = 0) &  a & b; #check slot... scale.data or data...
+for(j in 1:8) {prt[[j]] <- prt[[j]]  & NoLegend() }; #https://samuel-marsh.github.io/scCustomize/articles/Gene_Expression_Plotting.html # Alternative way to add the scale could be  to copy paste it in to image
+print(prt);dev.off()
+
+tplot=DimPlot(vari,reduction="umap",pt.size = 1, label = FALSE, label.size = 10,group.by = 'orig.ident',order=FALSE) + ggtitle("") #cols = c("#1fc600", "#b580a7", "#3366ff")
+jpeg(paste(nmj,"_stages.jpg"), width = 12000, height = 12000, quality = 100,pointsize = 16, res=1200); tplot & a & b;dev.off()
+# tplot[[1]]$layers[[1]]$aes_params$alpha = ifelse (vari@meta.data$orig.ident=='E14.25a', 0.97, 0.03);tplot 
+vtr = c('percent_ribo','percent.blood',"G2M.Score","S.Score",'percent.house','percent.mt','percent.link','percent.hsp'); #dev.off();
+jpeg(paste(nmj,"Vars to regress.jpg"), width = 12000, height = 12000, quality = 100,pointsize = 16, res=1200);#change the saving of the variables..
+DefaultAssay( vari) <- "integrated";FeaturePlot(vari, reduction = "umap",features = vtr,cols = c("#c0c0c0",'red'),pt.size = 1, order=TRUE, ncol=3) & a & b;dev.off();
+
+#The phase two of calculations:
+vars_t=c('Pitx2','Sox2','Acta2','Foxd1', 'Bmi1', 'Igfbp5', 'Lef1', 'Shh', 'Wnt10a', 'Wnt10b','Wnt4','Nphs1','Pax9', 'Hand1', 'Hand2', 'Barx1', 'Dlx5', 'Tfap2a','Tfap2b','Cdh1','Cdh3', 'Cdh5', 'Notch1', 'Notch2', 'Gli1', 'Ptch1', 'Lgr5', 'Sostdc1', 'Bmp4', 'Fgf8','Fgf9', 'Krt14', 'Epcam', 'Msx1','Msx2','Vim','Inha', 'Inhba', 'Inhbb', 'Inhbc', 'Inhbe') #
+#Bonus genes for the grant...:
+vars_t2=c('Fgf3', 'Fgf10', 'Bmp2', 'Bmp7', 'Pitx2', 'Pitx1',  'Lhx6', 'Lhx7', 'Lhx2', 'Pax9', 'Dlx1', 'Dlx2', 'Hand2', 'Hand1', 'p63', 'p21')
+hi='C:/scRNAseq_old_HKI/ok_total'
+setwd(dir=hi) #'D:/Data for Seurat Analysis/filtered_gene_bc_matrices/Data Filtered and Processed in Seurat/Corrected/E11/new'
+# vars_tt=read.csv("tobeplotted_tikka25523.csv", header = FALSE) #Shox2, Cdh6, Shh dotplotgenes2_balic3323.csv .. check this, may change..
+# vars_tt=as.list(vars_tt)$V1;vars_tt; length(vars_tt); # > vars_tt[!vars_tt %in% unique(ec)] # [1] 
+vars_tt2=read.csv("dotplotgenes2_balic3323.csv", header = FALSE) ;vars_tt2=as.list(vars_tt2)$V1;
+vars_tt=unique(c(vars_t,vars_t2))
+# pois=c("Tp53cp",  "Activin", "Ectodin", "Prx1"); vars_tt=vars_tt[!vars_tt %in% pois] #'Hand2'
+vars_tt=unique(c(vars_tt,vars_tt2,vars_t,vars_t2));length(vars_tt); 
+# vars_tt=unique(c(vars_tt))
+vtaux=vars_tt #vars_tt=vars_t2 # vars_tt=vars2 #if you need other set than vars_tt
+# C:\scRNAseq_old_HKI\E16 clusters
+# ok='C:/scRNAseq_old_HKI/E14 clusters/'; setwd(dir=ok) #ok='F:/hepa2/';
+#To plot the genes of interest, check the x and ylims..:
+DefaultAssay(vari)='SCT'; #RNA gives small Pitx2 values so use SCT here as well as with ScaleData below
+pb11a <- ScaleData(vari,features = rownames(vari),assay='SCT') #This is better! ; #If you do not get any individual gene hits with SCT assay, RNA assay and scaling might help with heatmap plotting..
+pb11a@meta.data$seurat_clusters <- droplevels(pb11a@meta.data$seurat_clusters)
+jei=GetAssayData(pb11a, slot = c("scale.data"));
+gc(); memory.limit(9999999999999);
+vr11=t(apply(jei, 1, function(x)(x-min(x))/(max(x)-min(x))));vr11=3*vr11
+pb11a <- SetAssayData(pb11a, slot = "scale.data", new.data = vr11)
+vars_tt=unique(c(vars_tt));vtaux=vars_tt
+lena=pb11a[vtaux,]; vtaux[!vtaux %in% rownames(lena)]# [1] "Foxi3"   "Tp53cp"  "Fgf3"    "Fgf4"    "Fgf20"   "Activin" "Ectodin" (Sostdc1 we have) "Prx1"    "Inhbc"   "Inhbe"   "Lhx7"    "p63"     "p21"   
+# find genes with non zero expression, modified from cell deletions: https://github.com/satijalab/seurat/issues/3854
+keep.genes <- rownames(lena[rowSums(lena) != 0,])
+lena <- lena[keep.genes,]
+#E16 missing: "Tp53cp"  "Fgf8"    "Activin" "Ectodin" "Prx1"    "Inhbc"   "Inhbe"   "Lhx7"    "p63"     "p21"  
+length(vtaux);length(vtaux[!vtaux %in% rownames(lena)])
+vtaux=vtaux[vtaux %in% rownames(lena)]
+#E16 currently:
+width = ceiling(13240*1.085); height = 13240; #check..
+prints=ceiling(length(vtaux[vtaux %in% rownames(lena)])/16)
+vt=vtaux#vars_tt[ rownames(lena) %in% vtaux ]; length(vt)
+add=prints*16-length(vt);add; 
+added=rep('Sox2', each=add); vt=c(vt,added)
+# ok='C:/scRNAseq_old_HKI/E14 clusters'
+setwd(dir=ok)
+DefaultAssay(vari) <- "SCT"; nmj='Total' ; 
+vars=c('Pitx2','Sox2','Shh','Acta2','Cdh5','Krt5','Krt14','Bmp4','Wnt10a','Fgf8');width = 10000*1.08; height = 10000;cols = c('green','red', 'blue','black','orange', 'yellow'); 
+vars2=c('Bmp4','Fgf8','Fgf9','Pitx1','Pitx2','Wnt10a','Wnt7b','Wnt4','Shh','Dlx5','Msx1','Msx2','Barx1')
+#CHECK X AND YLIMS!!! -> &  xlim(-6,9) & ylim(-7,6)
+hopl=FeaturePlot(vari, reduction = "umap",features = vars[1],pt.size = 2, order=T,cols = c("#c0c0c0",'red'),min.cutoff=0.5,ncol=1); 
+minMax(hopl$data$UMAP_1,maxDecimals = 2); minMax(hopl$data$UMAP_2,maxDecimals = 2)
+xmi=unlist(strsplit(minMax(hopl$data$UMAP_1,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[1];xmi=floor(as.numeric(xmi))
+xma=unlist(strsplit(minMax(hopl$data$UMAP_1,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[2];xma=ceiling(as.numeric(xma))
+ymi=unlist(strsplit(minMax(hopl$data$UMAP_2,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[1];ymi=floor(as.numeric(ymi))
+yma=unlist(strsplit(minMax(hopl$data$UMAP_2,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[2];yma=ceiling(as.numeric(yma))
+xmi;xma;ymi; yma #check that these are ok
+a=xlim(xmi,xma); b=ylim(ymi, yma)
+for (i in 1:(prints-1)) {jpeg(paste(nmj,"UMAPs of interesting genes",i,".jpg"), width = width, height = height, 
+                              quality = 100,pointsize = 1, res=1200); #width = 12000, height = 9700, CHECK X AND YLIMS!!!
+  prt=FeaturePlot(lena, reduction = "umap",features = vt[(16*i-16+1):(16*i)],slot='scale.data',
+                  pt.size = 1, order=T,cols = c("#c0c0c0",'red'),min.cutoff=1,ncol=4) &  a & b;
+  for(j in 1:15) {prt[[j]] <- prt[[j]]  & NoLegend() }; #https://samuel-marsh.github.io/scCustomize/articles/Gene_Expression_Plotting.html # Alternative way to add the scale could be  to copy paste it in to image
+  print(prt);dev.off()} # https://github.com/satijalab/seurat/issues/1080 to print just one scale automatically...
+#https://github.com/satijalab/seurat/issues/5466 #https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html
+
+#To plot the COSG genes, check the x and ylims..:
+#%% This is standard, but more genes are needed: # marker_cosg <- cosg(vari,groups='all',assay='SCT',slot='data',mu=1,n_genes_user=2000) 
+one='SCT';def='100';DefaultAssay( vari) <- one; #https://github.com/genecell/COSGR
+vari@active.ident =vari$seurat_clusters #!!
+marker_cosg<-cosg(vari,groups='all',assay=one, slot='data',mu=100,n_genes_user=3000,remove_lowly_expressed=TRUE,expressed_pct=0.1) #RNA seems to work.. check.. https://academic.oup.com/bib/article/23/2/bbab579/6511197?login=true
+#this is the best method for spatial umap plot genes, check the my below 1 if not ok cogs
+setwd(dir=ok); write.csv(marker_cosg, paste('Epit combo2_v2 DE genes_COSG_',one,def,namedate,'.csv'),quote = F); 
+dft=c(); for (i in 1:clusta) {dft=append(dft,list(data.frame(cbind(marker_cosg$names[,i],marker_cosg$scores[,i]))))}
+for (i in 1:clusta) {colnames(dft[[i]]) <- c('Genes','COSG Score')} #huh to give names to all dataframes has not been made easy...#https://www.tutorialspoint.com/how-to-convert-more-than-one-column-in-r-data-frame-to-from-integer-to-numeric-in-a-single-line-code
+#Moving average
+ap=c(); e=c(); jap=c(); rsum=c()
+for (i in 1:clusta) {
+  cx <- c(0,cumsum(marker_cosg$scores[1:300,i])); n=70 #n is the max de thershold amount of all the data
+  rsum =append(rsum,(cx[(n+1):length(cx)] - cx[1:(length(cx) - n)]) / n) }#https://stackoverflow.com/questions/743812/calculating-moving-average
+jap=matrix(as.vector(rsum),nrow=231,ncol=clusta) #https://stat.ethz.ch/R-manual/R-devel/library/base/html/matrix.html
+for (i in 1:clusta) {
+  jpeg(paste("lines",i,".jpg"), width = 1000, height = 1000, quality = 100,pointsize = 3, res=300);  
+  plot(1:120,jap[1:120,i]);dev.off() }
+dth=c()
+for (i in 1:clusta) {y=jap[1:120,i];x <- seq_along(y)
+plot(y ~ x); fit0 <- lm(y ~ x) #https://stackoverflow.com/questions/45295856/how-to-find-linear-trend-in-r
+fit1 <- segmented(fit0, seg.Z = ~ x,psi = list(x = c(10,50)))
+print(summary(fit1)); lines(x, predict(fit1), col = "red"); dth=append(dth,ceiling(fit1$psi[,'Est.']))} #
+a <- dth; b1 <- a[seq(1, length(dth), 2)]; b2 <- a[seq(2, length(dth), 2)]; #https://stackoverflow.com/questions/5237557/extract-every-nth-element-of-a-vector
+dd=data.frame(cbind(b1,b2)); colnames(dd)=c(unique(names(b1)),unique(names(b2))); rownames(dd)=1:clusta;dd; dd[,'psi2.x']
+## Integrated values should be used with logfc 1.5, since RNAs give negative clusters... but RNAs also possible...  vari=date1o; nmj='E16_TOT' ;
+#According to this article,https://academic.oup.com/bib/article/23/2/bbab579/6511197?login=true, norms are used:
+# ok='D:/Data for Seurat Analysis/filtered_gene_bc_matrices/Data Filtered and Processed in Seurat/Corrected/E14/';setwd(dir=ok)#o
+DefaultAssay( vari) <- "SCT" ##integrated values should be used with logfc 1.5, since RNAs give negative clusters... but RNAs also possible...  vari=date1o; nmj='E16_TOT' ;
+markers <- FindAllMarkers(vari, only.pos = TRUE, min.pct = 0.1, logfc.threshold = 0.5, test.use = "wilcox",recorrect_umi=FALSE) #if you have issues google the error code first, e.g. https://github.com/satijalab/seurat/issues/6427
+table(markers[markers[,'avg_log2FC']>0,'cluster']); table(markers[,'cluster']); head(markers[rev(order(markers[,'avg_log2FC'])),]) 
+m0=markers[rev(order(markers[,'avg_log2FC'])),]
+m1=m0[m0[,'avg_log2FC']>0.25,]
+m2=m1[m1[,'pct.1']>0.25,]
+m3=m2[m2[,'p_val_adj']<0.05,]
+mt=table(m3[,'cluster']); lim=quantile(mt,0.25); if (lim<30) {lim=30}; if (lim>300) {lim=300}
+m4=c();maxi=max(as.numeric(names(mt)))
+for (i in 1:maxi) {m4=rbind(m4,m3[m3[,'cluster']==i,][1:lim,])}
+list= na.omit(unique(m4[,'gene']))
+aux=round_any(dim(markers)[1]/10,20,f = ceiling) #5% of top, check that dim(markers)[1] is at least 100 and in top 5 are no inf/-infs
+infkp=round(quantile(markers[with(markers,order(-avg_log2FC)),][1:aux,'avg_log2FC'],0.33),0); #difp=round(quantile(markers[with(markers,order(-avg_diff)),][1:aux,'avg_log2FC'],0.33),0)
+infkm=round(quantile(markers[with(markers,order(avg_log2FC)),][1:aux,'avg_log2FC'],0.33),0); #difm=round(quantile(markers[with(markers,order(avg_diff)),][1:aux,'avg_log2FC'],0.33),0)
+markers[which(markers[,'avg_log2FC']=='Inf'),'avg_log2FC']=infkp; markers[which(markers[,'avg_log2FC']=='-Inf'),'avg_log2FC']=infkm
+markers[,'Cluster Difference']=markers[,'pct.1']-markers[,'pct.2']; new_cols = c(7,5,8,1,2,3,4,6);
+markers=markers[new_cols]; new_cols = c(1,5,2,6,7,3,8,4); markers=markers[new_cols];myList<-list();m1=max(as.numeric(markers[,'cluster'])); #https://dplyr.tidyverse.org/reference/filter.html
+for(i in 1:m1) {myList<-list.append(myList,data.frame(filter(markers, cluster == i)[rev(order(filter(markers, cluster == i)[,2], decreasing=FALSE)),]))} #check your variable, now logFC
+for(i in 1:m1) {write.xlsx(data.frame(myList[i]), paste('lt0.5_SCT',i,".xlsx"),row.names = FALSE)} #can be also with row names: row.names = TRUE
+require(openxlsx)
+dft=c(); for (i in 1:clusta) {dft=append(dft,list(data.frame(cbind(marker_cosg$names[,i],as.numeric(marker_cosg$scores[,i])))))}
+for (i in 1:clusta) {colnames(dft[[i]]) <- c('Genes','COSG Score')} #huh to give names to all dataframes has not been made easy...#https://www.tutorialspoint.com/how-to-convert-more-than-one-column-in-r-data-frame-to-from-integer-to-numeric-in-a-single-line-code
+ix=c();for (i in 1:clusta) {MovingAverages=jap[,i];n <- dim(dft[[1]])[1]; length(MovingAverages) <- n; Threshold=dd[i,'psi2.x'];length(Threshold) <- n; Wilcoxon_Gene=markers[markers[,'cluster']==i,'gene'];length(Wilcoxon_Gene) = n ;
+ix=append(ix,list(data.frame(cbind(dft[[i]],MovingAverages,Threshold,Wilcoxon_Gene))))}
+write.xlsx(ix, file = paste("Main clusters in main stages DE COSG 100µ vs. Wilcoxona",namedate,".xlsx"));
+
+vt1=c(); for (i in 1:length(ix)) {vt1=append(vt1,ix[[i]][1:ix[[i]][1,'Threshold'],1])}
+vars_tt=unique(c(vt1));#vars_tg=vars_tt
+p1_avg=AverageExpression(object = vari);
+p1=DataFrame(p1_avg$SCT) #check if you need RNA or SCT, RNA seems to be better for organizing genes of interest#maxe <- apply(p1, 1, max, na.rm=TRUE)
+# data=vari;
+top30=max(as.numeric(data@meta.data[,'seurat_clusters'])) * (5); #same as number of clusters time 30, or 10..
+aa=ceiling(top30/dim(table(vari@active.ident)[table(vari@active.ident)>0])); #this is 30 if top 30 is searched...
+vars_tg=unique(unlist(marker_cosg$names[1:aa,]));marker_cosg$names[1:aa,]; #which(vars_tt=='Ptch1') #unique( #which(vars_tt=='Ptch1')
+toti1=unique(as.vector((unlist(marker_cosg$names[1:aa,]))));
+toti=vars_tt[vars_tt %in% toti1];toti
+p3e=p1[toti,];p3e <- p3e[rowSums(is.na(p3e)) == 0, ]; 
+maxu=DataFrame(cbind(1:nrow(p3e), max.col(p3e, 'first')));
+row.names(maxu) <- row.names(p3e); 
+hhs=maxu[order(maxu[,2]),];#hhs;hhs$V2;
+table(hhs$V2 )
+# min(table(hhs$V2 ))<30 #Do not use while...
+# med=median(table(hhs$V2))
+# as.numeric(abs(table(hhs$V2)[order(table(hhs$V2))][1]-table(hhs$V2)[order(table(hhs$V2))][2])) > ceiling(med/5)
+
+i=1; for (i in 1:100) {if (as.numeric(abs(table(hhs$V2)[order(table(hhs$V2))][1]) < 3)) {print(i) #this min is 8-30
+  top30=max(as.numeric(data@meta.data[,'seurat_clusters'])) * (10+i*5) #this is the best method for spatial umap plot genes, check if you need cut2: 'marker_cosg$names[1:aa,cut2]': #Increase the ceiling to make more cluster in one (1)
+  aa=ceiling(top30/dim(table(vari@active.ident)[table(vari@active.ident)>0]));
+  toti1=unique(unlist(marker_cosg$names[1:aa,]));#marker_cosg$names[1:aa,];
+  # length(vars_tg); #which(vars_tt=='Ptch1') #unique( #which(vars_tt=='Ptch1')
+  # toti1=unique(as.vector((unlist(marker_cosg$names[1:aa,]))));
+  toti=vars_tt[vars_tt %in% toti1]; print(length(toti))
+  p3e=p1[toti,];p3e <- p3e[rowSums(is.na(p3e)) == 0, ]; 
+  maxu=DataFrame(cbind(1:nrow(p3e), max.col(p3e, 'first')));
+  row.names(maxu) <- row.names(p3e)
+  hhs=maxu[order(maxu[,2]),];med=median(table(hhs$V2))} } #hei hou smiley :) = hhs
+table(hhs$V2);
+vars_tg=row.names(hhs);length(vars_tg); rikit=vars_tg[grep("*Rik",vars_tg)]; 
+mirrit=vars_tg[grep("^Mir",vars_tg)]; vex=c(rikit,mirrit);vars_tg=vars_tg[!vars_tg %in% vex];table(hhs$V2)
+uips=c();for (i in 1:clusta) 
+{if (dim(hhs[hhs$V2==i,])[1]>20) {uips=append(uips,rownames(hhs[hhs$V2==i,])[1:40])} else 
+{uips=append(uips,rownames(hhs[hhs$V2==i,]))}}
+# with epithelial cells use also: # 
+pois=c('Xist','Tshz2','Crabp1','Nusap1','Nap1l1','Krt18','Dcn','Hmcn1','Serbp1'); #vars_tg=vars_tg[!vars_tg %in% pois]
+vtg2=c(); #for (i in 1:clusta) {vtg2=c(vtg2,rownames(hhs[hhs$V2==i,])[1:30])} #If you are sure about all the genes then:
+vtg2=uips #rownames(hhs)
+rikit=vtg2[grep("*Rik",vtg2)]; mirrit=vtg2[grep("^Mir",vtg2)]; 
+hissit=vtg2[grep("^His",vtg2)];vex=c(rikit,mirrit,hissit);
+vtg2=vtg2[!vtg2 %in% vex];vtg2=vtg2[!vtg2 %in% pois]
+vtg2=vtg2[!vtg2 %in% c(vtg2[grep("*mt-",vtg2)],vtg2[grep("*Col",vtg2)],vtg2[grep("*Gm",vtg2)])]
+p2=c('Xkr4', 'Kcnb2', 'Gdap1', 'Efhc1', 'Ptp4a1', 'Bend6')
+vtg2=vtg2[!vtg2 %in% p2]
+vtg2=vtg2[!is.na(vtg2)]
+vtg2=unique(c(vtg2,'Sox2','Pitx2','Shh')) #Aim for around 80-150, 293 ->262 ->180
+
+write.xlsx(vtg2, file = paste("Main clusters in main stages DE COSG 100µ_simple8",namedate,".xlsx"));
+
+# table(hopa[[1]][1]$data[hopa[[1]][1]$data[,'Identity']==1,'Feature'])# table(hopa[[1]][1]$data[,'Identity'])
+# table(hhs$V2)
+# vari@active.ident =vari$seurat_clusters this works btw for the labels in the plot:
+# Idents(vari) <- factor(x = Idents(vari), levels = order(levels(vari))) #https://github.com/satijalab/seurat/issues/1529
+# vari$seurat_clusters =factor(x = Idents(vari), levels = 1:6) #far from obvious, but was done app.r as: https://github.com/satijalab/seurat/issues/1697
+# levels(x = vari)=1:6
+# DimPlot( vari, reduction = "umap",pt.size = 2.5, label = TRUE, label.size =10.5 ,group.by = 'seurat_clusters') +ggtitle('') 
+
+# vtg3=read.csv("th.csv", header = FALSE)[,1]
+
+h=41000; w=12000  #check that you have unique gene names:
+what="GOSG DE Genes in UMAP Cell Clusters_reduced10a4"
+var=unique(vtg2); namee='with de genes by COSG';setwd(dir=ok); #genes of interest , de genes
+pb11a <- ScaleData(vari,features = rownames(vari),assay='SCT') ; 
+#If you do not get any individual gene hits with SCT assay, RNA assay and scaling might help with heatmap plotting..
+pb11a@meta.data$seurat_clusters <- droplevels(pb11a@meta.data$seurat_clusters)#https://github.com/satijalab/seurat/issues/5069, you may need d
+jpeg(paste("Heatmap_e",what,'.jpg'), width = w, height = h, quality = 100,pointsize = 12, res=1000);
+mapal <- colorRampPalette(RColorBrewer::brewer.pal(9,"PuRd"))(256) #https://github.com/satijalab/seurat/issues/1048
+hopa=DoHeatmap(pb11a, features = var, size = 2.5, slot='scale.data',group.by = 'seurat_clusters',
+               assay='SCT',group.bar.height=0.0075, angle = 0)# check assay...# https://satijalab.org/seurat/reference/doheatmap
+process <- caret::preProcess(as.data.frame(hopa[[1]][1]$data[,'Expression']), method=c("range")) 
+#https://satijalab.org/seurat/reference/doheatmap
+norm_scale <- predict(process, as.data.frame(hopa[[1]][1]$data[,'Expression']))*3
+hopa[[1]][1]$data[,'Expression']=norm_scale
+hopa+labs(color = "Cluster")+scale_fill_gradientn(colours = mapal); dev.off() # https://statistics.berkeley.edu/computing/r-t-tests #this works: https://www.projectpro.io/recipes/append-output-from-for-loop-dataframe-r
+#https://www.datasciencemadesimple.com/get-maximum-value-of-a-column-in-r-2/
+
+# dim(table(hopa[[1]][1]$data[,'Feature'])) #SCT:llä tulee kaikki...
+
+siis=names(rev(table(hopa[[1]][1]$data[,'Feature'])))
+sum(siis=='Pitx2');sum(siis=='Sox2');sum(siis=='Shh');siis
+siis=siis[1:(length(siis)-3)] #check this.. could be up to 3
+
+siis=siis[!siis %in% c('Pdia6','Rrbp1','Bambi','Lars2','Foxd1','Ub2c','Ube2c','Ndn','Fndc3c1','Npr3','Pcdh10',
+                       'Crif1','Pitx1','Plagl1','Cited1','Nrk','Tcf7l2','Prc1','Aspm','Ccnb1')] #check this.. could be up to 20...
+
+siis <- append(siis, 'Shh', after = which(siis=='Foxf2')) #check this gene
+siis <- append(siis, 'Sox2', after = which(siis=='Foxf2')) #check this gene Fzd10os
+siis <- append(siis, 'Pitx2', after = which(siis=='Foxf2')) #check this gene
+
+# write.csv(siis, file = paste("The main clusters in main stages DE COSG 100µ_simple_toclusta9",namedate,".csv"));
+
+h=41000; w=12000; what="GOSG DE Genes in UMAP Cell Clusters_reduced11a4"
+var=unique(siis); namee='with de genes by COSG';setwd(dir=ok); #genes of interest , de genes
+pb11a <- ScaleData(vari,features = rownames(vari),assay='RNA') ; #If you do not get any individual gene hits with SCT assay, RNA assay and scaling might help with heatmap plotting..
+pb11a@meta.data$seurat_clusters <- droplevels(pb11a@meta.data$seurat_clusters)#https://github.com/satijalab/seurat/issues/5069, you may need d
+jpeg(paste("Heatmap_e",what,'.jpg'), width = w, height = h, quality = 100,pointsize = 12, res=1000);
+mapal <- colorRampPalette(RColorBrewer::brewer.pal(9,"PuRd"))(256) #https://github.com/satijalab/seurat/issues/1048
+hopa=DoHeatmap(pb11a, features = var, size = 2.5, slot='scale.data',group.by = 'seurat_clusters',assay='SCT',group.bar.height=0.0075, angle = 0)# check assay...# https://satijalab.org/seurat/reference/doheatmap
+process <- caret::preProcess(as.data.frame(hopa[[1]][1]$data[,'Expression']), method=c("range")) #https://satijalab.org/seurat/reference/doheatmap
+norm_scale <- predict(process, as.data.frame(hopa[[1]][1]$data[,'Expression']))*3
+hopa[[1]][1]$data[,'Expression']=norm_scale
+hopa+labs(color = "Cluster")+scale_fill_gradientn(colours = mapal); dev.off()
+h=41000; w=12000; what="GOSG DE Genes in UMAP Cell Clusters_reduced12aa4"
+var=unique(siis); namee='with de genes by COSG';setwd(dir=ok); #genes of interest , de genes
+pb11a <- ScaleData(vari,features = rownames(vari),assay='SCT') ; #If you do not get any individual gene hits with SCT assay, RNA assay and scaling might help with heatmap plotting..
+pb11a@meta.data$seurat_clusters <- droplevels(pb11a@meta.data$seurat_clusters)#https://github.com/satijalab/seurat/issues/5069, you may need d
+jpeg(paste("Heatmap_e",what,'.jpg'), width = w, height = h, quality = 100,pointsize = 12, res=1000);
+mapal <- colorRampPalette(RColorBrewer::brewer.pal(9,"PuRd"))(256) #https://github.com/satijalab/seurat/issues/1048
+hopa=DoHeatmap(pb11a, features = var, size = 2.5, slot='scale.data',group.by = 'seurat_clusters',assay='SCT',group.bar.height=0.0075, angle = 0)# check assay...# https://satijalab.org/seurat/reference/doheatmap
+process <- caret::preProcess(as.data.frame(hopa[[1]][1]$data[,'Expression']), method=c("range")) #https://satijalab.org/seurat/reference/doheatmap
+norm_scale <- predict(process, as.data.frame(hopa[[1]][1]$data[,'Expression']))*3
+hopa[[1]][1]$data[,'Expression']=norm_scale
+hopa+labs(color = "Cluster")+scale_fill_gradientn(colours = mapal); dev.off()
+
+siis=names(rev(table(hopa[[1]][1]$data[,'Feature'])))
+write.csv(siis, file = paste("The main clusters in main stages DE COSG 100µ_simple_toclusta12",namedate,".csv"));
+
+DefaultAssay(vari)='SCT'; #RNA gives small Pitx2 values so use SCT here as well as with ScaleData below
+pb11a <- ScaleData(vari,features = rownames(vari),assay='SCT') 
+#This is better! ; #If you do not get any individual gene hits with SCT assay, RNA assay and scaling might help with heatmap plotting..
+pb11a@meta.data$seurat_clusters <- droplevels(pb11a@meta.data$seurat_clusters)
+jei=GetAssayData(pb11a, slot = c("scale.data"));
+gc(); memory.limit(9999999999999);
+vr11=t(apply(jei, 1, function(x)(x-min(x))/(max(x)-min(x))));vr11=3*vr11
+pb11a <- SetAssayData(pb11a, slot = "scale.data", new.data = vr11)
+# vtaux=#cosg genes... see below how....ix
+# vt1=c(); for (i in 1:length(ix)) {vt1=append(vt1,ix[[i]][1:ix[[i]][1,'Threshold'],1])}  
+vars_tt=unique(c(siis));
+vtaux=vars_tt
+# write.csv(vtaux, 'sel_cosg_genes_tikka27124.csv')
+lena=pb11a[vtaux,]; vtaux[!vtaux %in% rownames(lena)]# [1] "Foxi3"   "Tp53cp"  "Fgf3"    "Fgf4"    "Fgf20"   "Activin" "Ectodin" (Sostdc1 we have) "Prx1"    "Inhbc"   "Inhbe"   "Lhx7"    "p63"     "p21"   
+# find genes with non zero expression, modified from cell deletions: https://github.com/satijalab/seurat/issues/3854
+keep.genes <- rownames(lena[rowSums(lena) != 0,])
+lena <- lena[keep.genes,]
+#E16 missing: "Tp53cp"  "Fgf8"    "Activin" "Ectodin" "Prx1"    "Inhbc"   "Inhbe"   "Lhx7"    "p63"     "p21"  
+length(vtaux);length(vtaux[!vtaux %in% rownames(lena)])
+vtaux=vtaux[vtaux %in% rownames(lena)]
+#E16 currently:
+width = ceiling(13240*1.085); height = 13240; #check..
+prints=ceiling(length(vtaux[vtaux %in% rownames(lena)])/16)
+vt=vtaux#vars_tt[ rownames(lena) %in% vtaux ]; length(vt)
+add=prints*16-length(vt);add; 
+added=rep(vtaux[1], each=add); vt=c(vt,added)
+setwd(dir=ok)
+hopl=FeaturePlot(vari, reduction = "umap",features = vars[1],pt.size = 2, order=T,cols = c("#c0c0c0",'red'),min.cutoff=0.5,ncol=1); 
+minMax(hopl$data$UMAP_1,maxDecimals = 2); minMax(hopl$data$UMAP_2,maxDecimals = 2)
+xmi=unlist(strsplit(minMax(hopl$data$UMAP_1,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[1];xmi=floor(as.numeric(xmi))
+xma=unlist(strsplit(minMax(hopl$data$UMAP_1,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[2];xma=ceiling(as.numeric(xma))
+ymi=unlist(strsplit(minMax(hopl$data$UMAP_2,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[1];ymi=floor(as.numeric(ymi))
+yma=unlist(strsplit(minMax(hopl$data$UMAP_2,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[2];yma=ceiling(as.numeric(yma))
+xmi;xma;ymi; yma #check that these are ok
+a=xlim(xmi,xma); b=ylim(ymi, yma)
+prints
+for (i in 1:prints) {
+  jpeg(paste(nmj,"UMAPs of COSG genesi",i,".jpg"), width = width, height = height, quality = 100,pointsize = 1, res=1200); #width = 12000, height = 9700, CHECK X AND YLIMS!!!
+  prt=FeaturePlot(lena, reduction = "umap",features = vt[(16*i-16+1):(16*i)],slot='scale.data',pt.size = 1, order=T,cols = c("#c0c0c0",'red'),min.cutoff=1,ncol=4) &  a & b;
+  for(j in 1:15) {prt[[j]] <- prt[[j]]  & NoLegend() }; #https://samuel-marsh.github.io/scCustomize/articles/Gene_Expression_Plotting.html # Alternative way to add the scale could be  to copy paste it in to image
+  print(prt);dev.off()} # https://github.com/satijalab/seurat/issues/1080 to print just one scale automatically...
+
+i;j #j-1 goes to below:
+# for(j in (length(prt)+1):(16-length(prt)+1)) 
+# he=list(prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]])
+prt=prt[[1]]+prt[[2]]+prt[[3]]+prt[[4]]+prt[[5]]+prt[[6]]+prt[[7]]+prt[[8]]+prt[[9]]+prt[[9]]+prt[[9]]+
+  prt[[9]]+prt[[9]]+prt[[9]]+prt[[9]]+prt[[9]]
+# prt2=prt[[1]]+prt[[2]]+prt[[3]]+prt[[3]] #https://patchwork.data-imaginist.com/articles/guides/assembly.html
+jpeg(paste(nmj,"UMAPs of COSG genee",i,".jpg"), width = width, height = height, quality = 100,pointsize = 1, res=1200); #width = 12000, height = 9700, CHECK X AND YLIMS!!!
+# prt=FeaturePlot(lena, reduction = "umap",features = vt[(16*18-16+1):(16*18)],slot='scale.data',pt.size = 1, order=T,cols = c("#c0c0c0",'red'),min.cutoff=1,ncol=4) &  a & b;
+for(j in 1:15) {prt[[j]] <- prt[[j]]  & NoLegend()} #https://samuel-marsh.github.io/scCustomize/articles/Gene_Expression_Plotting.html # Alternative way to add the scale could be  to copy paste it in to image
+print(prt);
+dev.off() # https://github.com/satijalab/seurat/issues/1080 to print just one scale automatically...
+
+
+# p1_avg=AverageExpression(object = vari);p1=DataFrame(p1_avg$SCT) 
+# #check if you need RNA or SCT. If sct and rna same abount of genes use sct. But RNA seems to be better for organizing genes of interest#maxe <- apply(p1, 1, max, na.rm=TRUE); 
+# p2=p1[rownames(p1) %in% vars_tt,];p2 <- p2[rowSums(is.na(p2)) == 0, ] 
+# maxu=DataFrame(cbind(1:nrow(p2), max.col(p2, 'first'))); row.names(maxu) <- row.names(p2)
+# hhs=maxu[order(maxu[,2]),];hhs[,2] #hei hou smiley :) = hhs
+# vars_tt=row.names(hhs);vars_tt;length(vars_tt);vtaux=vars_tt; setwd(dir=ok)#https://statisticsglobe.com/select-top-n-highest-values-by-group-in-r
+
+h=44000; w=8000  #check that you have unique gene names:
+what="Genes of Interest in UMAP Cell Clusters"
+var=unique(vars_tt);setwd(dir=ok); #genes of interest , de genes
+pb11a <- ScaleData(vari,features = rownames(vari),assay='RNA') ; #If you do not get any individual gene hits with SCT assay, RNA assay and scaling might help with heatmap plotting..
+pb11a@meta.data$seurat_clusters <- droplevels(pb11a@meta.data$seurat_clusters)#https://github.com/satijalab/seurat/issues/5069, you may need d
+jpeg(paste("Heatmap_",what,'.jpg'), width = 12000, height = 38000, quality = 100,pointsize = 14, res=1200); #check the height
+mapal <- colorRampPalette(RColorBrewer::brewer.pal(9,"PuRd"))(256) #https://github.com/satijalab/seurat/issues/1048
+hopa=DoHeatmap(pb11a, features = var, size = 2.5, slot='scale.data',group.by = 'seurat_clusters',assay='SCT')# check assay...# https://satijalab.org/seurat/reference/doheatmap
+process <- caret::preProcess(as.data.frame(hopa[[1]][1]$data[,'Expression']), method=c("range"))
+norm_scale <- predict(process, as.data.frame(hopa[[1]][1]$data[,'Expression']))*3
+hopa[[1]][1]$data[,'Expression']=norm_scale
+hopa+labs(color = "Cluster")+scale_fill_gradientn(colours = mapal);dev.off()
+# write.csv(jang, file = "vari_genes.csv",quote = F) # https://statistics.berkeley.edu/computing/r-t-tests
+
+
+# df=data.frame(); for (i in 1:clusta) {df = rbind(df, rowSums(combo[[i]]>0)/dim(combo[[i]])[2])} #this works: https://www.projectpro.io/recipes/append-output-from-for-loop-dataframe-r
+# df=t(df);dim(df);df=data.frame(df); head(df)# colMaxs(as.matrix(df[sapply(df, is.numeric)])) #https://www.datasciencemadesimple.com/get-maximum-value-of-a-column-in-r-2/
+
+
+what="Fractions and Numbers of Genes in Cells at UMAP Cell Clusters_all genes_RNAe"; #this is the ok version so far...
+vari=vari; clusta=length(table ( Idents( vari) )); options(scipen = 999);clusta #in case of the regressing genes, you may need this..
+vari@active.ident =vari$seurat_clusters #!!
+data=vari;
+DefaultAssay(data) <- "RNA";clusta=length(table ( Idents( data) )); 
+test=GetAssayData(data); head(test)# #18003 genes (in rows) and 19196 cells (in columns) at E16 in total
+combo=c(); for (i in 1:clusta) {combo=append(combo,test[,data@meta.data[,'seurat_clusters']==i])}
+df1=data.frame(); for (i in 1:clusta) {df1 = rbind(df1, rowSums(combo[[i]]>0)/dim(combo[[i]])[2])} #this works: https://www.projectpro.io/recipes/append-output-from-for-loop-dataframe-r
+df1=t(df1);dim(df1);df1=data.frame(df1); head(df1)# colMaxs(as.matrix(df1[sapply(df1, is.numeric)])) #https://www.datasciencemadesimple.com/get-maximum-value-of-a-column-in-r-2/
+library(berryFunctions);
+chp=quantile(as.numeric(as.matrix(df1))[as.numeric(as.matrix(df1))>0],0.79);chp #https://www.geeksforgeeks.org/create-matrix-from-vectors-in-r/ #66 in 14, 75 in 16
+op=df1
+for (i in 1:dim(op)[1]) {
+  ve1=df1[i,df1[i,]>=chp];rep1=1 #or quantile(as.vector(unlist(ve1)),0.95) etc....
+  ve2=df1[i,df1[i,]<chp]; rep2=mean(as.vector(unlist(ve2))) #print(mean(as.vector(unlist(ve2)))) #{rep2=mean(as.vector(unlist(ve2)))} else {rep2=0.05} #:) ... get these thing what are requested promptly enough for those in need...
+  op[i,df1[i,]>=chp]=rep1
+  op[i,df1[i,]<chp]=rep2}; 
+op[1:10,1:dim(op)[2]]; #df1[1:10,1:7]; hist(op)
+# if (mean(as.vector(unlist(ve2))) < 0.05) {rep2=mean(as.vector(unlist(ve2)))} else rep2=0.05
+dfo=op*df1; df=dfo
+df=insertRows(df, 1, new = as.vector(table ( Idents( data) )))
+rownames(df)=c('Total Number of Cells',rownames(combo[[1]])); 
+colnames(df)=1:clusta;head(df);# cut=rowMaxs(as.matrix(df[sapply(df, is.numeric)]))>0.05; #sum(cut); cut=rowMins(as.matrix(df[sapply(df, is.numeric)]))>0.05; sum(cut), with min cut you get less genes..# df=df[cut,];head(df);
+leps=data.frame(); for (i in 1:clusta) {leps=rbind(leps,rowSums(combo[[i]]>0))}
+leps=t(leps);leps=data.frame(leps); rownames(leps)=rownames(test); colnames(leps)=1:clusta;head(leps);
+leps=insertRows(leps, 1, new = as.vector(table ( Idents( data) )))
+rownames(leps)=c('Total Number of Cells',rownames(test)); # leps=leps[cut,]
+list_of_datasets <- list("Cell Fractions" = df, "Cell Numbers" = leps)
+require(openxlsx); write.xlsx(list_of_datasets, file = paste(what,namedate,'.xlsx'), rowNames=TRUE, colNames=TRUE)
+
+hipse=c(); for (i in 1:clusta) {hipse=append(hipse,sum(leps[2:dim(leps)[1],i]!=0))}
+hp=data.frame(hipse)
+hp$index <- 1:nrow(hp)
+hp[rev(order(hp)),]
+df <-hp[rev(order(hp$hipse)),] #this may explain the low expression in DEs
+write.csv(df, paste('Fraction gene total numberse',namedate,'.csv'),quote = F); 
+
+DefaultAssay( vari) <- "SCT";
+vari = CellCycleScoring(vari, s.features = str_to_title(cc.genes.updated.2019$s.genes), g2m.features = str_to_title(cc.genes.updated.2019$g2m.genes), set.ident = TRUE,n = 21) #n = 21
+tplot=DimPlot(vari,reduction="umap",pt.size = 3, label = FALSE, label.size = 10,group.by = 'Phase',order=FALSE) + ggtitle("") #cols = c("#1fc600", "#b580a7", "#3366ff")
+jpeg("G1.jpg", width = 12000, height = 9700, quality = 100,pointsize = 16, res=1200);
+tplot[[1]]$layers[[1]]$aes_params$alpha = ifelse (vari@meta.data$Phase=='G1', 0.95, 0.05); tplot;dev.off()
+jpeg("G2M.jpg", width = 12000, height = 9700, quality = 100,pointsize = 16, res=1200);
+tplot[[1]]$layers[[1]]$aes_params$alpha = ifelse (vari@meta.data$Phase=='G2M', 0.95, 0.05); tplot;dev.off()
+jpeg("S.jpg", width = 12000, height = 9700, quality = 100,pointsize = 16, res=1200);
+tplot[[1]]$layers[[1]]$aes_params$alpha = ifelse (vari@meta.data$Phase=='S', 0.95, 0.05); tplot;dev.off()
+vari@active.ident =vari$seurat_clusters #!! #Rishi data did not have SCT as such but RNA which was normalized...
+#https://www.google.com/search?q=how+to+end+break+mode+in+excel&rlz=1C1GCEB_enFI951FI951&oq=how+to+end+break+mode+in+excel&aqs=chrome..69i57j0i22i30l2.4975j0j7&sourceid=chrome&ie=UTF-8
+
+h=41000; w=12000 
+var=unique(list);setwd(dir=ok); #genes of interest , de genes
+DefaultAssay( vari) <- "SCT";#if you have small number of genes of interest in cluster you may test also integrated (or SCT)
+what='Wilcox DE Genes in UMAP Cell Clusters'
+pb11a <- ScaleData(vari,features = rownames(vari),assay='RNA') ; #If you do not get any individual gene hits with SCT assay, RNA assay and scaling might help with heatmap plotting..
+pb11a@meta.data$seurat_clusters <- droplevels(pb11a@meta.data$seurat_clusters)#https://github.com/satijalab/seurat/issues/5069, you may need d
+jpeg(paste("Heatmap_",what,'.jpg'), width = w, height = h, quality = 100,pointsize = 12, res=1000);
+# png(paste('Heatmap_',what,'.jpg'), width = w, height = h,pointsize = 12, res=1200);#you may need to play with this...
+mapal <- colorRampPalette(RColorBrewer::brewer.pal(9,"PuRd"))(256) #https://github.com/satijalab/seurat/issues/1048
+hopa=DoHeatmap(pb11a, features = var, size = 2.5, slot='scale.data',group.by = 'seurat_clusters',assay='SCT')# check assay...# https://satijalab.org/seurat/reference/doheatmap
+process <- caret::preProcess(as.data.frame(hopa[[1]][1]$data[,'Expression']), method=c("range"))
+norm_scale <- predict(process, as.data.frame(hopa[[1]][1]$data[,'Expression']))*3
+hopa[[1]][1]$data[,'Expression'] = norm_scale
+hopa+labs(color = "Cluster")+scale_fill_gradientn(colours = mapal);dev.off()# write.csv(jang, file = "vari_genes.csv",quote = F) # https://statistics.berkeley.edu/computing/r-t-tests
+
+#Genes to regressout in later analysis stages, such as with epithelia...
+leps2=leps[2:dim(leps)[1],] #rownames(leps2[rev(order(leps2[,10])),][1:1000,])
+sorta=c(); number=c()
+liste=c(50,100,150,200,300,400,500,600,700,800,900,1000,1500,2000,2500,3000,5000)
+for (j in 1:length(liste)) 
+{for (i in 1:clusta) 
+{sorta=append(sorta,rownames(leps2[rev(order(leps2[,i])),][1:liste[j],]))} #list(data.frame(cbind(
+  sorta2=unique(sorta); number=append(number,length(sorta2)) }#1480 with 1000, 2893 with 2000 (1446.5) and 761 with 500 (761*2=1522), (300: 470*3.33: 1565.1), (200: 314*5 [1] 1570), 100->1720, 50>1820 and 20>2400 
+plot(number) # -> is still within linear, i.e. 300-800 are probably the best
+sorta=c(); for (i in 1:clusta) {sorta=append(sorta,rownames(leps2[rev(order(leps2[,i])),][1:number[12],]))}
+sorta2=unique(sorta); write.csv(sorta2, file =paste("E14_regress_oute_genes",namedate,".csv"),quote = F) # "E14_epi_v2_regress_out_genes_26623_v2.csv",quote = F)
+
+
+#Almost the same...
+DefaultAssay(vari)='SCT'; #RNA gives small Pitx2 values so use SCT here as well as with ScaleData below
+pb11a <- ScaleData(vari,features = rownames(vari),assay='SCT') #This is better! ; #If you do not get any individual gene hits with SCT assay, RNA assay and scaling might help with heatmap plotting..
+pb11a@meta.data$seurat_clusters <- droplevels(pb11a@meta.data$seurat_clusters)
+jei=GetAssayData(pb11a, slot = c("scale.data"));gc(); memory.limit(9999999999999);
+vr11=t(apply(jei, 1, function(x)(x-min(x))/(max(x)-min(x))));vr11=3*vr11; pb11a <- SetAssayData(pb11a, slot = "scale.data", new.data = vr11)
+lena=pb11a[vtg2,]; #vtg2[!vtg2 %in% rownames(lena)] ->>  na # find genes with non zero expression, modified from cell deletions: https://github.com/satijalab/seurat/issues/3854
+keep.genes <- rownames(lena[rowSums(lena) != 0,]); lena <- lena[keep.genes,]
+width = ceiling(13240*1.085); height = 13240;prints=ceiling(length(vtg2[vtg2 %in% rownames(lena)])/16); vt=vtg2 #vars_tt[ rownames(lena) %in% vtg2 ]; length(vt)
+add=prints*16-length(vt);add; added=rep(vt[length(vt)], each=add);vt[length(vt)]; 
+vt=c(vt,added); 
+a=xlim(xmi,xma); b=ylim(ymi, yma); setwd(dir=ok)
+for (i in 1:prints) {jpeg(paste(nmj,"UMAPs of GOSG genes",i,".jpg"), width = width, height = height, quality = 100,pointsize = 1, res=1200); #width = 12000, height = 9700, CHECK X AND YLIMS!!!
+  prt=FeaturePlot(lena, reduction = "umap",features = vt[(16*i-16+1):(16*i)],slot='scale.data',pt.size = 1, order=T,cols = c("#c0c0c0",'red'),min.cutoff=1,ncol=4) &  a & b;
+  for(j in 1:15) {prt[[j]] <- prt[[j]]  & NoLegend() }; #https://samuel-marsh.github.io/scCustomize/articles/Gene_Expression_Plotting.html # Alternative way to add the scale could be  to copy paste it in to image
+  print(prt);dev.off()} 
+
+sorta1=read.csv("E11_regress_out_genes Tikka 24.7.23 .csv", header = TRUE) #Shox2, Cdh6, Shh dotplotgenes2_balic3323.csv .. check this, may change..
+sorta2=read.csv("E14_regress_oute_genes Tikka 25.7.23 .csv", header = TRUE)
+sorta3=read.csv("E16_regress_out_genes Tikka 24.7.23 .csv", header = TRUE)
+```
