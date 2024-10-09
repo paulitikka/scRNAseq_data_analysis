@@ -77,7 +77,6 @@ library(cluster); library(factoextra); library(raveio);library(segmented)
 ```
 
 
-
 # Setting Global Variables
 ```{r, warning=FALSE,message=FALSE}
 thedate <- strftime(Sys.Date(),"%d%m%y")
