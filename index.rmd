@@ -30,8 +30,6 @@ output:
 ```
 
 
-
-
 # Loading All R Packages
 ```{r, warning=FALSE,message=FALSE}
 library(rlang); library(dplyr); #Error: package 'rtracklayer' could not be loaded, Error: (converted from warning) package 'rlang' was built under R version 4.2.3
@@ -76,6 +74,7 @@ library(cluster); library(factoextra); library(raveio);library(segmented)
 
 
 ```
+
 
 
 
@@ -193,11 +192,6 @@ Sys.unsetenv("GITHUB_PAT");
 #raw:196/28 data # https://satijalab.org/seurat/articles/essential_commands.html
 
 ```
-
-
-
-
-
 
 
 # The preporsessing function before the analysis
@@ -419,6 +413,7 @@ Pre_anal_process=function(data,small,case='E11',mart) { #small to 'yes' if you h
 
 
 
+
 # Filterings
 ```{r, warning=FALSE,message=FALSE,fig.width=8.0}
 
@@ -449,6 +444,7 @@ Pre_anal_process=function(data,small,case='E11',mart) { #small to 'yes' if you h
 
 
 ```
+
 
 
 
@@ -651,6 +647,7 @@ dispersion_removal=function(vari) {
 
 
 
+
 # Execution of Preprocessing and Initial Analysis
 ```{r, warning=FALSE,message=FALSE,fig.width=8.0}
 
@@ -699,6 +696,7 @@ dispersion_removal=function(vari) {
 
 
 
+
 # Plotting Your Data
 ```{r, warning=FALSE,message=FALSE,fig.width=8.0}
 
@@ -739,6 +737,7 @@ DimPlot(Data3,reduction="umap",pt.size = 2, label = TRUE, label.size = 7,group.b
 
 
 ```
+
 
 
 
@@ -1232,8 +1231,6 @@ prt#print(prt);
 ```
 
 
-
-
 # Disclaimer
 ```{r, warning=FALSE,message=FALSE}
 # This is a part of on-going research work that has not been published yet and I cannot take a responsibility if something above is not working/ok in your system/research/etc. in 100% accuracy. 
@@ -1245,6 +1242,7 @@ prt#print(prt);
 # Thanks and sorry for possible inconveniences in advance! :)
 
 ```
+
 
 # About R Setups
 ```{r, warning=FALSE,message=FALSE}
@@ -1259,6 +1257,7 @@ sessionInfo()
 ```
 
 
+# Anything else?
 ```{r, echo=FALSE} 
 # Adding HTML is straightforward in knit... you just add it and it works! :)
 # https://stackoverflow.com/questions/74785107/can-we-comment-out-rmarkdown-so-that-its-not-included-in-the-exported-html
@@ -1267,3 +1266,4 @@ sessionInfo()
 <div id="sfcl75p3txn9pqr845xuy88gkar9rxwdsal"></div>
 <script type="text/javascript" src="https://counter6.optistats.ovh/private/counter.js?c=l75p3txn9pqr845xuy88gkar9rxwdsal&down=async" async></script>
 <noscript><a href="https://www.freecounterstat.com" title="free website visitor counter"><img src="https://counter6.optistats.ovh/private/freecounterstat.php?c=l75p3txn9pqr845xuy88gkar9rxwdsal" border="0" title="free website visitor counter" alt="free website visitor counter"></a></noscript>
+
