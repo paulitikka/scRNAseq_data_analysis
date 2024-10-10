@@ -1,6 +1,6 @@
 
 ---
-title: "scRNAseq Data Analysis"
+title: "scRNAseq Analysis"
 author: "Pauli Tikka"
 date: "`r Sys.Date()`"
 output: 
@@ -88,17 +88,18 @@ namedate = date#Change this (!)
 # loadfonts(device = "win") #Same applies here.
 gc(); memory.limit(9999999999999);options(scipen = 999) #you do not want to see scientific numbering # You need to have rtools: https://cran.r-project.org/bin/windows/Rtools/rtools40.html
 write('PATH="${RTOOLS40_HOME}\\usr\\bin;${PATH}"', file = "~/.Renviron", append = TRUE); 
-Sys.unsetenv("GITHUB_PAT");
-# This somethimes work, and somethimes not:
-# mart <- useEnsembl(biomart = "ensembl", dataset = 'mmusculus_gene_ensembl',mirror = "uswest") #?useEnsembl
-# mart <- useMart('ensembl', dataset = 'mmusculus_gene_ensembl', host = 'https://useast.ensembl.org')
 # The mart/ensemble is often problematic (does not load or find the server). So, instead of loading this, try to save this...  or check host: 
+# Sys.unsetenv("GITHUB_PAT"); mart <- useMart('ensembl', dataset = 'mmusculus_gene_ensembl', host = 'https://useast.ensembl.org') 
+mart <- useEnsembl(biomart = "ensembl", dataset = 'mmusculus_gene_ensembl',mirror = "uswest") #?useEnsembl
 # https://support.bioconductor.org/p/108324/
-# Check also the place where to save:
+#Check also the place where to save:
 # ok='E:/uuttapuutta/'
 # setwd(dir=ok) #load(file = "hei.Rdata") #save.image('hei.Rdata')
 
 ```
+
+
+
 
 # Importing Data and Metadata
 ```{r, warning=FALSE,message=FALSE}
@@ -1232,38 +1233,3 @@ prt#print(prt);
 ```
 
 
-
-
-# Disclaimer
-```{r, warning=FALSE,message=FALSE}
-# This is a part of on-going research work that has not been published yet and I cannot take a responsibility if something above is not working/ok in your system/research/etc. in 100% accuracy. 
-# Furthermore, I am inbound to update these sites relatively often so a grain of salt is needed when reading these... :)
-# Please note also that most of the plotting functions have bee commented out so that their execution would not take time when compiling as well as due quality reasons: 
-# Rmarkdown print is not as good in the screen and in final (html) document as the similar with knitr's 'include_graphics' that shows the full scale image.
-# In addition, no sensitive data has been shared and you see only 'examples' here. Moreover, I am not an expert on biology (or even at computing per se) and may not know your specific biochemical and/or mechanical questions that you maybe using this for. 
-# Not to mention few, I just want to say that I am just doing the analysis for understanding the data partly on its own right with the context as mentioned above and partly as a starting 'side project'.
-# Thanks and sorry for possible inconveniences in advance! :)
-
-```
-
-# About R Setups
-```{r, warning=FALSE,message=FALSE}
-# As per this date, see above or below, 
-thedate 
-# all the above codes work to produce results with the data files given.
-# All the packages have been copied to local drive (10.10.24), i.e. the content of '.libPaths()'
-# R is 'R version 4.3.1 (2023-06-16 ucrt)' (with 'version'/'getRversion()' command)
-# And RStudio is '2024.4.0.735' (with 'RStudio.Version()' command)
-# In addition, the following information regarding the setups is given:
-sessionInfo()
-```
-
-
-```{r, echo=FALSE} 
-# Adding HTML is straightforward in knit... you just add it and it works! :)
-# https://stackoverflow.com/questions/74785107/can-we-comment-out-rmarkdown-so-that-its-not-included-in-the-exported-html
-```
-
-<div id="sfcl75p3txn9pqr845xuy88gkar9rxwdsal"></div>
-<script type="text/javascript" src="https://counter6.optistats.ovh/private/counter.js?c=l75p3txn9pqr845xuy88gkar9rxwdsal&down=async" async></script>
-<noscript><a href="https://www.freecounterstat.com" title="free website visitor counter"><img src="https://counter6.optistats.ovh/private/freecounterstat.php?c=l75p3txn9pqr845xuy88gkar9rxwdsal" border="0" title="free website visitor counter" alt="free website visitor counter"></a></noscript>
