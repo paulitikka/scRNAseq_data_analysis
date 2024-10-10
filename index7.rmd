@@ -30,7 +30,6 @@ output:
 ```
 
 
-
 # Loading All R Packages
 ```{r, warning=FALSE,message=FALSE}
 library(rlang); library(dplyr); #Error: package 'rtracklayer' could not be loaded, Error: (converted from warning) package 'rlang' was built under R version 4.2.3
@@ -76,6 +75,7 @@ library(cluster); library(factoextra); library(raveio);library(segmented)
 
 
 ```
+
 
 
 
@@ -194,7 +194,6 @@ Sys.unsetenv("GITHUB_PAT");
 #raw:196/28 data # https://satijalab.org/seurat/articles/essential_commands.html
 
 ```
-
 
 
 # The preporsessing function before the analysis
@@ -409,7 +408,6 @@ Pre_anal_process=function(data,small,case='E11',mart) { #small to 'yes' if you h
   if (small!='yes') {data=ax(data,urgency,case)};#data[c('Pitx2','Sox2'),]
   return(data)}
 ```
-
 
 
 # Filterings
@@ -738,6 +736,7 @@ load("C:/Users/patati/Desktop/TurkuOW/RWork/all_good.RData")
 
 
 
+
 # Visualizations
 ```{r, warning=FALSE,message=FALSE,fig.width=8.0}
 
@@ -758,6 +757,10 @@ gc(); memory.limit(9999999999999);
 
 # Näillä selviää Monocle Pseudotimen alku: #https://sib-swiss.github.io/single-cell-training/2021.11/day3/trajectory_analysis/
 
+# vari=vari3
+# ok='C:/scRNAseq_old_HKI/E11 clusters/'; setwd(dir=ok) #ok='F:/hepa2/';
+# ok='C:/scRNAseq_old_HKI/E14 clusters/'; setwd(dir=ok)
+# ok='C:/scRNAseq_old_HKI/E16 clusters/'; setwd(dir=ok)
 
 DefaultAssay(vari) <- 'RNA' #check..."SCT"; #vari=vari; # vari=mes3a; c('Pitx2','Sox2','Shh','Acta2') #'Vim','Msx1'
 nmj='Total' ; 
@@ -775,13 +778,12 @@ xmi;xma;ymi; yma #check that these are ok
 a=xlim(xmi,xma); b=ylim(ymi, yma)
 FeaturePlot(vari, reduction = "umap", features = vars[1],pt.size = 2, order=T,cols = c("#c0c0c0",'red'),min.cutoff=1,ncol=1) & a  & b & NoLegend();#dev.off() + ggtitle('') # a=xlim(-13,-1.75); b=ylim(-6,5.25) 
 # jpeg(paste("UMAPs",nmj, "_Primary Genes.jpg"), width = width, height = height, quality = 100,pointsize = 16, res=1200);#quality = 100,
-FeaturePlot(vari, reduction = "umap",features = vars,cols = c("#c0c0c0",'red'),pt.size = 1.5, order=TRUE,ncol=3, min.cutoff = 1)& a  & b & NoLegend();#dev.off()
+# FeaturePlot(vari, reduction = "umap",features = vars,cols = c("#c0c0c0",'red'),pt.size = 1.5, order=TRUE,ncol=3, min.cutoff = 1)& a  & b & NoLegend();dev.off()
 # jpeg(paste("UMAP_Clusters", nmj, '.jpg'), width = width, height = height, quality = 100,pointsize = 14, res=1200);#,'orange', 'yellow #https://statisticsglobe.com/change-font-size-of-ggplot2-plot-in-r-axis-text-main-title-legend
 # label order: E14_epit$seurat_clusters <- factor(E14_epit$seurat_clusters, levels = c(1:5)) 
 DimPlot( vari, reduction = "umap",pt.size = 2, label = TRUE, label.size =10.5 ,group.by = 'seurat_clusters',order=TRUE) +ggtitle('') +  
   theme(axis.title = element_text(size = 10.5)) + theme(legend.text = element_text(size = 10.5)) + guides(colour = guide_legend(override.aes = list(size=10.5))) & a  & b;#dev.off()
-table(vari$orig.ident);#table(vari$seurat_clusters)
-
+table(vari$orig.ident);table(vari$seurat_clusters)
 #Just to get the scale to the primary genes:
 DefaultAssay(vari)='RNA'#'SCT'; #RNA gives small Pitx2 values so use SCT here as well as with ScaleData below
 pb11a <- ScaleData(vari,features = rownames(vari),assay='RNA') #or SCT... This is better! ; #If you do not get any individual gene hits with SCT assay, RNA assay and scaling might help with heatmap plotting..
@@ -798,7 +800,7 @@ print(prt);#dev.off()
 # jpeg(paste(nmj,"_stages.jpg"), width = 12000, height = 12000, quality = 100,pointsize = 16, res=1200); tplot & a & b;dev.off()
 # tplot[[1]]$layers[[1]]$aes_params$alpha = ifelse (vari@meta.data$orig.ident=='E14.25a', 0.97, 0.03);tplot 
 vtr = c('percent_ribo','percent.blood',"G2M.Score","S.Score",'percent.house','percent.mt','percent.link','percent.hsp'); #dev.off();
-# jpeg(paste(nmj,"Vars to regress.jpg"), width = 12000, height = 12000, quality = 100,pointsize = 16, res=1200);#change the saving of the variables..
+jpeg(paste(nmj,"Vars to regress.jpg"), width = 12000, height = 12000, quality = 100,pointsize = 16, res=1200);#change the saving of the variables..
 DefaultAssay( vari) <- "integrated";FeaturePlot(vari, reduction = "umap",features = vtr,cols = c("#c0c0c0",'red'),pt.size = 1, order=TRUE, ncol=3) & a & b;#dev.off();
 
 #The phase two of calculations:
@@ -883,10 +885,8 @@ for (i in 1:clusta) {
 dth=c()
 for (i in 1:clusta) {y=jap[1:120,i];x <- seq_along(y)
 plot(y ~ x); fit0 <- lm(y ~ x) #https://stackoverflow.com/questions/45295856/how-to-find-linear-trend-in-r
-fit1 <- segmented(fit0, seg.Z = ~ x,psi = list(x = c(10,50)),control=seg.control(display=FALSE))
-# print(summary(fit1)); 
-# lines(x, predict(fit1), col = "red"); 
-dth=append(dth,ceiling(fit1$psi[,'Est.']))} #
+fit1 <- segmented(fit0, seg.Z = ~ x,psi = list(x = c(10,50)))
+print(summary(fit1)); lines(x, predict(fit1), col = "red"); dth=append(dth,ceiling(fit1$psi[,'Est.']))} #
 a <- dth; b1 <- a[seq(1, length(dth), 2)]; b2 <- a[seq(2, length(dth), 2)]; #https://stackoverflow.com/questions/5237557/extract-every-nth-element-of-a-vector
 dd=data.frame(cbind(b1,b2)); colnames(dd)=c(unique(names(b1)),unique(names(b2))); rownames(dd)=1:clusta;dd; dd[,'psi2.x']
 ## Integrated values should be used with logfc 1.5, since RNAs give negative clusters... but RNAs also possible...  vari=date1o; nmj='E16_TOT' ;
@@ -916,7 +916,7 @@ dft=c(); for (i in 1:clusta) {dft=append(dft,list(data.frame(cbind(marker_cosg$n
 for (i in 1:clusta) {colnames(dft[[i]]) <- c('Genes','COSG Score')} #huh to give names to all dataframes has not been made easy...#https://www.tutorialspoint.com/how-to-convert-more-than-one-column-in-r-data-frame-to-from-integer-to-numeric-in-a-single-line-code
 ix=c();for (i in 1:clusta) {MovingAverages=jap[,i];n <- dim(dft[[1]])[1]; length(MovingAverages) <- n; Threshold=dd[i,'psi2.x'];length(Threshold) <- n; Wilcoxon_Gene=markers[markers[,'cluster']==i,'gene'];length(Wilcoxon_Gene) = n ;
 ix=append(ix,list(data.frame(cbind(dft[[i]],MovingAverages,Threshold,Wilcoxon_Gene))))}
-# write.xlsx(ix, file = paste("Main clusters in main stages DE COSG 100µ vs. Wilcoxona",namedate,".xlsx"));
+write.xlsx(ix, file = paste("Main clusters in main stages DE COSG 100µ vs. Wilcoxona",namedate,".xlsx"));
 
 vt1=c(); for (i in 1:length(ix)) {vt1=append(vt1,ix[[i]][1:ix[[i]][1,'Threshold'],1])}
 vars_tt=unique(c(vt1));#vars_tg=vars_tt
@@ -948,8 +948,7 @@ i=1; for (i in 1:100) {if (as.numeric(abs(table(hhs$V2)[order(table(hhs$V2))][1]
   maxu=DataFrame(cbind(1:nrow(p3e), max.col(p3e, 'first')));
   row.names(maxu) <- row.names(p3e)
   hhs=maxu[order(maxu[,2]),];med=median(table(hhs$V2))} } #hei hou smiley :) = hhs
-
-# table(hhs$V2);
+table(hhs$V2);
 vars_tg=row.names(hhs);length(vars_tg); rikit=vars_tg[grep("*Rik",vars_tg)]; 
 mirrit=vars_tg[grep("^Mir",vars_tg)]; vex=c(rikit,mirrit);vars_tg=vars_tg[!vars_tg %in% vex];table(hhs$V2)
 uips=c();for (i in 1:clusta) 
@@ -1001,7 +1000,7 @@ hopa+labs(color = "Cluster")+scale_fill_gradientn(colours = mapal); #dev.off() #
 # dim(table(hopa[[1]][1]$data[,'Feature'])) #SCT:llä tulee kaikki...
 
 siis=names(rev(table(hopa[[1]][1]$data[,'Feature'])))
-sum(siis=='Pitx2');sum(siis=='Sox2');#sum(siis=='Shh');siis
+sum(siis=='Pitx2');sum(siis=='Sox2');sum(siis=='Shh');siis
 siis=siis[1:(length(siis)-3)] #check this.. could be up to 3
 
 siis=siis[!siis %in% c('Pdia6','Rrbp1','Bambi','Lars2','Foxd1','Ub2c','Ube2c','Ndn','Fndc3c1','Npr3','Pcdh10',
@@ -1092,7 +1091,7 @@ prt=prt[[1]]+prt[[2]]+prt[[3]]+prt[[4]]+prt[[5]]+prt[[6]]+prt[[7]]+prt[[8]]+prt[
 # jpeg(paste(nmj,"UMAPs of COSG genee",i,".jpg"), width = width, height = height, quality = 100,pointsize = 1, res=1200); #width = 12000, height = 9700, CHECK X AND YLIMS!!!
 # prt=FeaturePlot(lena, reduction = "umap",features = vt[(16*18-16+1):(16*18)],slot='scale.data',pt.size = 1, order=T,cols = c("#c0c0c0",'red'),min.cutoff=1,ncol=4) &  a & b;
 for(j in 1:15) {prt[[j]] <- prt[[j]]  & NoLegend()} #https://samuel-marsh.github.io/scCustomize/articles/Gene_Expression_Plotting.html # Alternative way to add the scale could be  to copy paste it in to image
-print(prt);
+prt#print(prt);
 # dev.off() # https://github.com/satijalab/seurat/issues/1080 to print just one scale automatically...
 # 
 # 
@@ -1224,7 +1223,6 @@ print(prt);
 ```
 
 
-
 # Disclaimer
 ```{r, warning=FALSE,message=FALSE}
 # This is a part of on-going research work that has not been published yet and I cannot take a responsibility if something above is not working/ok in your system/research/etc. in 100% accuracy. 
@@ -1236,7 +1234,6 @@ print(prt);
 # Thanks and sorry for possible inconveniences in advance! :)
 
 ```
-
 
 
 # About R Setups
@@ -1252,8 +1249,7 @@ sessionInfo()
 ```
 
 
-
-<!-- # Anything else? -->
+# Anything else?
 ```{r, echo=FALSE} 
 # Adding HTML is straightforward in knit... you just add it and it works! :)
 # https://stackoverflow.com/questions/74785107/can-we-comment-out-rmarkdown-so-that-its-not-included-in-the-exported-html
