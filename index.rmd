@@ -1263,8 +1263,6 @@ sessionInfo()
 ```
 
 
-
-<!-- # Anything else? -->
 ```{r, echo=FALSE} 
 # Adding HTML is straightforward in knit... you just add it and it works! :)
 # https://stackoverflow.com/questions/74785107/can-we-comment-out-rmarkdown-so-that-its-not-included-in-the-exported-html
