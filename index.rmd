@@ -31,6 +31,7 @@ output:
 
 
 
+
 # Loading All R Packages
 ```{r, warning=FALSE,message=FALSE}
 library(rlang); library(dplyr); #Error: package 'rtracklayer' could not be loaded, Error: (converted from warning) package 'rlang' was built under R version 4.2.3
@@ -79,6 +80,7 @@ library(cluster); library(factoextra); library(raveio);library(segmented)
 
 
 
+
 # Setting Global Variables
 ```{r, warning=FALSE,message=FALSE}
 thedate <- strftime(Sys.Date(),"%d%m%y")
@@ -99,6 +101,7 @@ Sys.unsetenv("GITHUB_PAT");
 # setwd(dir=ok) #load(file = "hei.Rdata") #save.image('hei.Rdata')
 
 ```
+
 
 
 # Importing Data and Metadata
@@ -194,6 +197,7 @@ Sys.unsetenv("GITHUB_PAT");
 #raw:196/28 data # https://satijalab.org/seurat/articles/essential_commands.html
 
 ```
+
 
 
 
@@ -412,6 +416,7 @@ Pre_anal_process=function(data,small,case='E11',mart) { #small to 'yes' if you h
 
 
 
+
 # Filterings
 ```{r, warning=FALSE,message=FALSE,fig.width=8.0}
 
@@ -442,6 +447,7 @@ Pre_anal_process=function(data,small,case='E11',mart) { #small to 'yes' if you h
 
 
 ```
+
 
 
 
@@ -646,6 +652,7 @@ dispersion_removal=function(vari) {
 
 
 
+
 # Execution of Preprocessing and Initial Analysis
 ```{r, warning=FALSE,message=FALSE,fig.width=8.0}
 
@@ -695,6 +702,7 @@ dispersion_removal=function(vari) {
 
 
 
+
 # Plotting Your Data
 ```{r, warning=FALSE,message=FALSE,fig.width=8.0}
 
@@ -735,6 +743,7 @@ load("C:/Users/patati/Desktop/TurkuOW/RWork/all_good.RData")
 
 
 ```
+
 
 
 
@@ -1225,6 +1234,7 @@ print(prt);
 
 
 
+
 # Disclaimer
 ```{r, warning=FALSE,message=FALSE}
 # This is a part of on-going research work that has not been published yet and I cannot take a responsibility if something above is not working/ok in your system/research/etc. in 100% accuracy. 
@@ -1236,6 +1246,7 @@ print(prt);
 # Thanks and sorry for possible inconveniences in advance! :)
 
 ```
+
 
 
 
