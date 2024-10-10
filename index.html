@@ -7,9 +7,9 @@
 
         <meta name="author" content="Pauli Tikka" />
     
-        <meta name="date" content="2024-10-09" />
+        <meta name="date" content="2024-10-10" />
     
-    <title>scRNAseq Analysis</title>
+    <title>scRNAseq Data Analysis</title>
 
         <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1825,6 +1825,9 @@ margin-left: 0 !important;
             of Preprocessing and Initial Analysis</a></li>
             <li><a href="#plotting-your-data" id="toc-plotting-your-data">Plotting Your Data</a></li>
             <li><a href="#visualizations" id="toc-visualizations">Visualizations</a></li>
+            <li><a href="#disclaimer" id="toc-disclaimer">Disclaimer</a></li>
+            <li><a href="#about-r-setups" id="toc-about-r-setups">About
+            R Setups</a></li>
             </ul>
           </div>
           <div data-position="sidebar:post-end" class="InjectedComponents"><div class="dark-theme-toggler"><div class="toggle "><div class="toggle-track"><div class="toggle-track-check"><img src="data:image/png;base64,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" role="presentation" style="pointer-events: none;" width="16" height="16"></div> <div class="toggle-track-x"><img src="data:image/png;base64,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" role="presentation" style="pointer-events: none;" width="16" height="16"></div></div> <div class="toggle-thumb"></div></div> <input type="checkbox" aria-label="Switch between Dark and Default theme" class="toggler-screen-reader-only"></div></div>
@@ -1834,12 +1837,12 @@ margin-left: 0 !important;
    
    
         
-      <h1 class="title">scRNAseq Analysis</h1>
+      <h1 class="title">scRNAseq Data Analysis</h1>
       
       <p class="authors">
            <span class="glyphicon glyphicon-user"></span> Pauli Tikka
       </p>
-         <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2024-10-09</p>
+         <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2024-10-10</p>
            
 
    
@@ -1914,13 +1917,13 @@ namedate = date#Change this (!)
 # loadfonts(device = &quot;win&quot;) #Same applies here.
 gc(); memory.limit(9999999999999);options(scipen = 999) #you do not want to see scientific numbering # You need to have rtools: https://cran.r-project.org/bin/windows/Rtools/rtools40.html</code></pre>
 <pre><code>##            used   (Mb) gc trigger   (Mb) max used   (Mb)
-## Ncells 22622115 1208.2   35585745 1900.5 33111542 1768.4
-## Vcells 38780675  295.9   56908450  434.2 47356994  361.4</code></pre>
+## Ncells 22622194 1208.2   35585925 1900.5 33111692 1768.4
+## Vcells 38781167  295.9   56911337  434.2 47359422  361.4</code></pre>
 <pre><code>## [1] Inf</code></pre>
 <pre class="r"><code>write(&#39;PATH=&quot;${RTOOLS40_HOME}\\usr\\bin;${PATH}&quot;&#39;, file = &quot;~/.Renviron&quot;, append = TRUE); 
 # The mart/ensemble is often problematic (does not load or find the server). So, instead of loading this, try to save this...  or check host: 
 # Sys.unsetenv(&quot;GITHUB_PAT&quot;); mart &lt;- useMart(&#39;ensembl&#39;, dataset = &#39;mmusculus_gene_ensembl&#39;, host = &#39;https://useast.ensembl.org&#39;) 
-mart &lt;- useEnsembl(biomart = &quot;ensembl&quot;, dataset = &#39;mmusculus_gene_ensembl&#39;,mirror = &quot;uswest&quot;) #?useEnsembl
+# mart &lt;- useEnsembl(biomart = &quot;ensembl&quot;, dataset = &#39;mmusculus_gene_ensembl&#39;,mirror = &quot;uswest&quot;) #?useEnsembl
 # https://support.bioconductor.org/p/108324/
 #Check also the place where to save:
 # ok=&#39;E:/uuttapuutta/&#39;
@@ -2549,8 +2552,8 @@ clusta=length(table ( Idents( data) )); options(scipen = 999);clusta</code></pre
 <pre><code>## [1] 14</code></pre>
 <pre class="r"><code>gc(); memory.limit(9999999999999);</code></pre>
 <pre><code>##              used   (Mb) gc trigger    (Mb)   max used   (Mb)
-## Ncells   23013729 1229.1   35585745  1900.5   33580435 1793.4
-## Vcells 1066457425 8136.5 1537438721 11729.8 1101476240 8403.6</code></pre>
+## Ncells   22890270 1222.5   35585925  1900.5   33577713 1793.3
+## Vcells 1066102927 8133.8 1536604881 11723.4 1102523947 8411.6</code></pre>
 <pre><code>## [1] Inf</code></pre>
 <pre class="r"><code># Näillä selviää Monocle Pseudotimen alku: #https://sib-swiss.github.io/single-cell-training/2021.11/day3/trajectory_analysis/
 
@@ -2638,8 +2641,8 @@ pb11a@meta.data$seurat_clusters &lt;- droplevels(pb11a@meta.data$seurat_clusters
 jei=GetAssayData(pb11a, slot = c(&quot;scale.data&quot;));
 gc(); memory.limit(9999999999999);</code></pre>
 <pre><code>##              used    (Mb) gc trigger    (Mb)   max used    (Mb)
-## Ncells   23239899  1241.2   35585745  1900.5   35585745  1900.5
-## Vcells 1715356940 13087.2 4167522236 31795.7 4158252493 31725.0</code></pre>
+## Ncells   23116543  1234.6   35585925  1900.5   35585925  1900.5
+## Vcells 1715002640 13084.5 4167096842 31792.5 4157897998 31722.3</code></pre>
 <pre><code>## [1] Inf</code></pre>
 <pre class="r"><code>vr11=t(apply(jei, 1, function(x)(x-min(x))/(max(x)-min(x))));vr11=3*vr11
 pb11a &lt;- SetAssayData(pb11a, slot = &quot;scale.data&quot;, new.data = vr11)
@@ -3584,8 +3587,8 @@ pb11a@meta.data$seurat_clusters &lt;- droplevels(pb11a@meta.data$seurat_clusters
 jei=GetAssayData(pb11a, slot = c(&quot;scale.data&quot;));
 gc(); memory.limit(9999999999999);</code></pre>
 <pre><code>##              used    (Mb) gc trigger    (Mb)   max used    (Mb)
-## Ncells   23540266  1257.2   35585745  1900.5   35585745  1900.5
-## Vcells 2318781553 17690.9 4167522236 31795.7 4167522197 31795.7</code></pre>
+## Ncells   23431165  1251.4   35585925  1900.5   35585925  1900.5
+## Vcells 2318454963 17688.5 4171293971 31824.5 4171293971 31824.5</code></pre>
 <pre><code>## [1] Inf</code></pre>
 <pre class="r"><code>vr11=t(apply(jei, 1, function(x)(x-min(x))/(max(x)-min(x))));vr11=3*vr11
 pb11a &lt;- SetAssayData(pb11a, slot = &quot;scale.data&quot;, new.data = vr11)
@@ -3774,6 +3777,334 @@ prt#print(prt);
 # sorta1=read.csv(&quot;E11_regress_out_genes Tikka 24.7.23 .csv&quot;, header = TRUE) #Shox2, Cdh6, Shh dotplotgenes2_balic3323.csv .. check this, may change..
 # sorta2=read.csv(&quot;E14_regress_oute_genes Tikka 25.7.23 .csv&quot;, header = TRUE);
 # sorta3=read.csv(&quot;E16_regress_out_genes Tikka 24.7.23 .csv&quot;, header = TRUE);</code></pre>
+</div>
+<div id="disclaimer" class="section level1">
+<h1>Disclaimer</h1>
+<pre class="r"><code># This is a part of on-going research work that has not been published yet and I cannot take a responsibility if something above is not working/ok in your system/research/etc. in 100% accuracy. 
+# Furthermore, I am inbound to update these sites relatively often so a grain of salt is needed when reading these... :)
+# Please note also that most of the plotting functions have bee commented out so that their execution would not take time when compiling as well as due quality reasons: Rmarkdown print is not as good in the screen and in final (html) document as the similar with knitr&#39;s &#39;include_graphics&#39; that shows the full scale image.
+# In addition, no sensitive data has been shared and you see only &#39;examples&#39; here. Moreover, I am not an expert on biology (or even at computing per se) and may not know your specific biochemical and/or mechanical questions that you maybe using this for. 
+# Not to mention few, I just want to say that I am just doing the analysis for understanding the data partly on its own right with the context as mentioned above and partly as a starting &#39;side project&#39;.
+# Thanks and sorry for possible inconveniences in advance! :)</code></pre>
+</div>
+<div id="about-r-setups" class="section level1">
+<h1>About R Setups</h1>
+<pre class="r"><code># As per this date, see above or below, 
+thedate </code></pre>
+<pre><code>## [1] &quot;101024&quot;</code></pre>
+<pre class="r"><code># all the above codes work to produce results with the data files given.
+# All the packages have been copied to local drive (10.10.24), i.e. the content of &#39;.libPaths()&#39;
+# R is &#39;R version 4.3.1 (2023-06-16 ucrt)&#39; (with &#39;version&#39;/&#39;getRversion()&#39; command)
+# And RStudio is &#39;2024.4.0.735&#39; (with &#39;RStudio.Version()&#39; command)
+# In addition, the following information regarding the setups is given:
+sessionInfo()</code></pre>
+<pre><code>## R version 4.3.1 (2023-06-16 ucrt)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 19045)
+## 
+## Matrix products: default
+## 
+## 
+## locale:
+## [1] LC_COLLATE=Finnish_Finland.utf8  LC_CTYPE=Finnish_Finland.utf8   
+## [3] LC_MONETARY=Finnish_Finland.utf8 LC_NUMERIC=C                    
+## [5] LC_TIME=Finnish_Finland.utf8    
+## 
+## time zone: Europe/Helsinki
+## tzcode source: internal
+## 
+## attached base packages:
+##  [1] grid      splines   tools     parallel  stats4    stats     graphics 
+##  [8] grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+##   [1] segmented_2.0-3                 nlme_3.1-163                   
+##   [3] raveio_0.9.0                    dataMaid_1.4.1                 
+##   [5] berryFunctions_1.22.5           CellChat_1.6.1                 
+##   [7] AppliedPredictiveModeling_1.1-7 magick_2.8.3                   
+##   [9] png_0.1-8                       ggpubr_0.6.0                   
+##  [11] presto_1.0.0                    colorspace_2.1-0               
+##  [13] shape_1.4.6.1                   FNN_1.1.4                      
+##  [15] sna_2.7-2                       network_1.18.2                 
+##  [17] statnet.common_4.9.0            RcppEigen_0.3.4.0.0            
+##  [19] RSpectra_0.16-1                 ComplexHeatmap_2.18.0          
+##  [21] ggrepel_0.9.3                   Rtsne_0.17                     
+##  [23] SpatialExperiment_1.12.0        expm_0.999-9                   
+##  [25] svglite_2.1.3                   ggalluvial_0.12.5              
+##  [27] NMF_0.27                        rngtools_1.5.2                 
+##  [29] registry_0.5-1                  caret_6.0-94                   
+##  [31] pbapply_1.7-2                   future.apply_1.11.1            
+##  [33] sparklyr_1.8.4                  ggvenn_0.1.10                  
+##  [35] parallelDist_0.2.6              leidenbase_0.1.27              
+##  [37] BiocManager_1.30.22             missMDA_1.19                   
+##  [39] clustifyr_1.14.0                hrbrthemes_0.8.7               
+##  [41] affy_1.80.0                     sctransform_0.3.5              
+##  [43] cowplot_1.1.3                   scales_1.3.0                   
+##  [45] slingshot_2.10.0                TrajectoryUtils_1.10.1         
+##  [47] princurve_2.1.6                 destiny_3.16.0                 
+##  [49] ggbeeswarm_0.7.2                ggthemes_5.1.0                 
+##  [51] trendsceek_1.0.0                oligo_1.66.0                   
+##  [53] oligoClasses_1.64.0             ArrayExpress_1.62.0            
+##  [55] affyio_1.72.0                   conos_1.5.2                    
+##  [57] igraph_2.0.3                    BH_1.84.0-0                    
+##  [59] namespace_0.9.1                 SparkR_2.3.0                   
+##  [61] circlize_0.4.15                 org.Hs.eg.db_3.18.0            
+##  [63] Factoshiny_2.5                  FactoInvestigate_1.9           
+##  [65] FactoMineR_2.10                 shiny_1.8.1                    
+##  [67] Rmisc_1.5.1                     plyr_1.8.9                     
+##  [69] BayesSpace_1.12.0               lattice_0.21-8                 
+##  [71] bit64_4.0.5                     bit_4.0.5                      
+##  [73] glmGamPoi_1.14.3                scran_1.30.2                   
+##  [75] cluster_2.1.4                   factoextra_1.0.7               
+##  [77] gdata_3.0.0                     rlist_0.4.6.2                  
+##  [79] lpsymphony_1.30.0               rpart.plot_3.1.2               
+##  [81] rpart_4.1.19                    WriteXLS_6.5.0                 
+##  [83] PRROC_1.3.1                     reshape2_1.4.4                 
+##  [85] openxlsx_4.2.5.2                runjags_2.2.2-4                
+##  [87] devtools_2.4.5                  usethis_2.2.3                  
+##  [89] DESeq2_1.42.0                   ompr.roi_1.0.2                 
+##  [91] ompr_1.0.4                      ROI.plugin.symphony_1.0-0      
+##  [93] ROI.plugin.glpk_1.0-0           rcbc_0.1.0.9001                
+##  [95] ROI_1.0-1                       lpSolve_5.6.20                 
+##  [97] harmony_1.2.0                   Rcpp_1.0.11                    
+##  [99] stringi_1.7.12                  nichenetr_2.0.0                
+## [101] SCINA_1.2.0                     gplots_3.1.3.1                 
+## [103] MASS_7.3-60                     sleepwalk_0.3.2                
+## [105] lubridate_1.9.2                 forcats_1.0.0                  
+## [107] stringr_1.5.1                   purrr_1.0.2                    
+## [109] readr_2.1.5                     tibble_3.2.1                   
+## [111] tidyverse_2.0.0                 demCore_0.0.0.9000             
+## [113] qdapRegex_0.7.8                 spatstat.geom_3.2-9            
+## [115] spatstat.data_3.0-4             proxy_0.4-27                   
+## [117] popsicleR_0.2.1                 scMCA_0.2.0                    
+## [119] celldex_1.12.0                  umap_0.2.10.0                  
+## [121] neldermead_1.0-12               optimsimplex_1.0-8             
+## [123] optimbase_1.0-10                RANN_2.6.1                     
+## [125] ggplotify_0.1.2                 RColorBrewer_1.1-3             
+## [127] ggExtra_0.10.1                  crayon_1.5.2                   
+## [129] magrittr_2.0.3                  gridExtra_2.3                  
+## [131] session_1.0.3                   future_1.33.1                  
+## [133] SingleR_2.4.1                   gtools_3.9.5                   
+## [135] ape_5.7-1                       clustree_0.5.1                 
+## [137] ggraph_2.2.1                    corrplot_0.92                  
+## [139] patchwork_1.2.0                 SeuratWrappers_0.3.1           
+## [141] pathviewr_1.1.7                 VennDiagram_1.7.3              
+## [143] futile.logger_1.4.3             DoubletDecon_1.1.6             
+## [145] scDblFinder_1.16.0              DoubletFinder_2.0.3            
+## [147] scrubletR_0.1.0                 monocle_2.30.0                 
+## [149] DDRTree_0.1.5                   irlba_2.3.5.1                  
+## [151] VGAM_1.1-10                     xlsx_0.6.5                     
+## [153] R.utils_2.12.3                  R.oo_1.26.0                    
+## [155] R.methodsS3_1.8.2               htmltools_0.5.7                
+## [157] scMerge_1.18.0                  COSG_0.9.0                     
+## [159] janitor_2.2.0                   IntEREst_1.26.0                
+## [161] GenomicFiles_1.38.0             edgeR_4.0.16                   
+## [163] limma_3.58.1                    Rsamtools_2.16.0               
+## [165] org.Mm.eg.db_3.18.0             scRNAseq_2.16.0                
+## [167] zellkonverter_1.12.1            VISION_3.0.1                   
+## [169] scclusteval_0.0.0.9000          singleCellTK_2.12.2            
+## [171] DelayedArray_0.28.0             SparseArray_1.2.3              
+## [173] S4Arrays_1.2.0                  abind_1.4-5                    
+## [175] Matrix_1.6-5                    biomaRt_2.58.2                 
+## [177] SCopeLoomR_0.13.0               SeuratData_0.2.2               
+## [179] SeuratObject_4.1.3              Seurat_4.3.0                   
+## [181] SMITE_1.30.0                    doMPI_0.2.2                    
+## [183] Rmpi_0.7-2                      doParallel_1.0.17              
+## [185] doSNOW_1.0.20                   snow_0.4-4                     
+## [187] iterators_1.0.14                foreach_1.5.2                  
+## [189] data.table_1.14.8               BiocParallel_1.34.2            
+## [191] plotly_4.10.4                   KernSmooth_2.23-22             
+## [193] xgboost_1.7.7.1                 GENIE3_1.24.0                  
+## [195] SCENIC_1.3.1                    AUCell_1.24.0                  
+## [197] monocle3_1.3.1                  tidyr_1.3.1                    
+## [199] checkmate_2.2.0                 sf_1.0-15                      
+## [201] SeuratDisk_0.0.0.9017           LoomExperiment_1.20.0          
+## [203] rhdf5_2.46.1                    loomR_0.2.1.9000               
+## [205] hdf5r_1.3.10                    R6_2.5.1                       
+## [207] jsonlite_1.8.7                  scater_1.30.1                  
+## [209] ggplot2_3.5.0                   scuttle_1.12.0                 
+## [211] SingleCellExperiment_1.24.0     SummarizedExperiment_1.32.0    
+## [213] MatrixGenerics_1.14.0           matrixStats_1.0.0              
+## [215] reticulate_1.31                 rjson_0.2.21                   
+## [217] tximeta_1.20.3                  GenomicFeatures_1.54.3         
+## [219] AnnotationDbi_1.64.1            Biobase_2.60.0                 
+## [221] eisaR_1.14.1                    BSgenome_1.70.2                
+## [223] rtracklayer_1.62.0              BiocIO_1.12.0                  
+## [225] Biostrings_2.68.1               XVector_0.40.0                 
+## [227] GenomicRanges_1.52.0            GenomeInfoDb_1.38.5            
+## [229] IRanges_2.34.1                  S4Vectors_0.38.1               
+## [231] BiocGenerics_0.48.1             dplyr_1.1.4                    
+## [233] rlang_1.1.3                    
+## 
+## loaded via a namespace (and not attached):
+##   [1] plumber_1.2.2                 zoo_1.8-12                   
+##   [3] hexbin_1.28.3                 sp_2.1-3                     
+##   [5] tidygraph_1.3.1               pkgconfig_2.0.3              
+##   [7] ruv_0.9.7.1                   pheatmap_1.0.12              
+##   [9] phangorn_2.11.1               later_1.3.1                  
+##  [11] lambda.r_1.2.4                fdrtool_1.2.17               
+##  [13] GSVAdata_1.38.0               promises_1.2.1               
+##  [15] leaps_3.1                     RMySQL_0.10.27               
+##  [17] Hmisc_5.1-1                   pbmcapply_1.5.1              
+##  [19] sessioninfo_1.2.2             QuickJSR_1.1.3               
+##  [21] graphlayouts_1.1.1            laeken_0.5.3                 
+##  [23] remotes_2.5.0                 DBI_1.2.2                    
+##  [25] preprocessCore_1.64.0         urlchecker_1.0.1             
+##  [27] gtable_0.3.5                  lme4_1.1-35.1                
+##  [29] minqa_1.2.6                   filelock_1.0.3               
+##  [31] RcppHNSW_0.6.0                TTR_0.24.4                   
+##  [33] caTools_1.18.2                ggforce_0.4.1                
+##  [35] reactome.db_1.86.2            DiagrammeR_1.0.11            
+##  [37] systemfonts_1.0.6             RcppAnnoy_0.0.22             
+##  [39] futile.options_1.0.1          M3Drop_1.28.0                
+##  [41] mitml_0.4-5                   glue_1.6.2                   
+##  [43] xts_0.13.2                    curl_5.0.2                   
+##  [45] geneplotter_1.80.0            fontBitstreamVera_0.1.1      
+##  [47] flashClust_1.01-2             CORElearn_1.57.3             
+##  [49] ggnewscale_0.4.10             bluster_1.12.0               
+##  [51] DEoptimR_1.1-3                Rttf2pt1_1.3.12              
+##  [53] inline_0.3.19                 RSQLite_2.3.1                
+##  [55] munsell_0.5.1                 ScaledMatrix_1.10.0          
+##  [57] Rsymphony_0.1-33              units_0.8-5                  
+##  [59] restfulr_0.0.15               Rhdf5lib_1.24.1              
+##  [61] assertthat_0.2.1              tidyselect_1.2.1             
+##  [63] yulab.utils_0.1.4             memoise_2.0.1                
+##  [65] xml2_1.3.6                    sass_0.4.9                   
+##  [67] vipor_0.4.7                   affxparser_1.74.0            
+##  [69] httpcode_0.3.0                bbmle_1.0.25.1               
+##  [71] dqrng_0.3.2                   BiocFileCache_2.10.2         
+##  [73] parallelly_1.37.1             tzdb_0.4.0                   
+##  [75] openssl_2.1.1                 generics_0.1.3               
+##  [77] BiasedUrn_2.0.11              dbplyr_2.5.0                 
+##  [79] polyclip_1.10-6               plotrix_3.8-4                
+##  [81] geneLenDataBase_1.38.0        sparsesvd_0.2-2              
+##  [83] highr_0.10                    mvtnorm_1.2-2                
+##  [85] pan_1.9                       gdtools_0.3.7                
+##  [87] leiden_0.4.3.1                htmlTable_2.4.2              
+##  [89] annotate_1.80.0               ResidualMatrix_1.12.0        
+##  [91] viridisLite_0.4.2             interactiveDisplayBase_1.40.0
+##  [93] xtable_1.8-4                  RcppParallel_5.1.7           
+##  [95] rsvd_1.0.5                    ggnetwork_0.5.13             
+##  [97] logging_0.10-108              beachmat_2.18.0              
+##  [99] filearray_0.1.6               progress_1.2.3               
+## [101] farver_2.1.1                  ipred_0.9-14                 
+## [103] goseq_1.54.0                  lmtest_0.9-40                
+## [105] rstudioapi_0.16.0             xlsxjars_0.6.1               
+## [107] vegan_2.6-4                   mgcv_1.9-0                   
+## [109] DT_0.32                       slam_0.1-50                  
+## [111] profvis_0.3.8                 mice_3.16.0                  
+## [113] lava_1.8.0                    multcomp_1.4-25              
+## [115] carData_3.0-5                 gfonts_0.2.0                 
+## [117] pkgbuild_1.4.4                quadprog_1.5-8               
+## [119] pillar_1.9.0                  ROI.plugin.lpsolve_1.0-2     
+## [121] dir.expiry_1.10.0             fontquiver_0.2.1             
+## [123] HDF5Array_1.30.0              seqinr_4.2-36                
+## [125] cachem_1.0.8                  ggridges_0.5.6               
+## [127] ranger_0.16.0                 sandwich_3.1-0               
+## [129] car_3.1-2                     hardhat_1.3.1                
+## [131] seqLogo_1.68.0                zlibbioc_1.46.0              
+## [133] entropy_1.3.1                 combinat_0.0-8               
+## [135] boot_1.3-30                   clue_0.3-64                  
+## [137] estimability_1.5              spatstat.utils_3.0-4         
+## [139] survival_3.5-7                randomForest_4.7-1.1         
+## [141] yaml_2.3.7                    vcd_1.4-12                   
+## [143] hms_1.1.3                     Rdpack_2.6                   
+## [145] fastmatch_1.1-4               gower_1.0.1                  
+## [147] uwot_0.1.16                   coda_0.19-4.1                
+## [149] evaluate_0.23                 codetools_0.2-19             
+## [151] BiocNeighbors_1.18.0          utf8_1.2.3                   
+## [153] ellipsis_0.3.2                fgsea_1.28.0                 
+## [155] knitr_1.45                    graph_1.80.0                 
+## [157] GetoptLong_1.0.5              viridis_0.6.5                
+## [159] fitdistrplus_1.1-11           GenomicAlignments_1.38.2     
+## [161] beeswarm_0.4.0                rJava_1.0-11                 
+## [163] gridBase_0.4-7                ggsignif_0.6.4               
+## [165] glmnet_4.1-8                  batchelor_1.18.1             
+## [167] backports_1.4.1               multcompView_0.1-10          
+## [169] ensembldb_2.26.0              nnet_7.3-19                  
+## [171] fastICA_1.2-4                 ff_4.0.12                    
+## [173] bdsmatrix_1.3-6               progressr_0.14.0             
+## [175] terra_1.7-71                  timeDate_4032.109            
+## [177] ROCR_1.0-11                   rstatix_0.7.2                
+## [179] visNetwork_2.1.2              qlcMatrix_0.9.7              
+## [181] fs_1.6.3                      bslib_0.6.1                  
+## [183] KEGGREST_1.42.0               deldir_2.0-4                 
+## [185] listenv_0.9.1                 pander_0.6.5                 
+## [187] eds_1.4.0                     rmdformats_1.0.4             
+## [189] swagger_3.33.1                loe_1.1                      
+## [191] BiocVersion_3.18.1            hwriter_1.3.2.1              
+## [193] labeling_0.4.3                askpass_1.2.0                
+## [195] prettyunits_1.2.0             formatR_1.14                 
+## [197] docopt_0.7.1                  robustbase_0.99-2            
+## [199] ModelMetrics_1.2.2.2          GO.db_3.18.0                 
+## [201] TH.data_1.1-2                 DelayedMatrixStats_1.24.0    
+## [203] tensor_1.5                    loo_2.7.0                    
+## [205] ica_1.0-3                     compiler_4.3.1               
+## [207] crul_1.4.0                    fontLiberation_0.1.0         
+## [209] lpSolveAPI_5.5.2.0-17.11      StanHeaders_2.32.6           
+## [211] scatterplot3d_0.3-44          VariantAnnotation_1.48.1     
+## [213] extrafont_0.19                jrc_0.6.0                    
+## [215] tcltk_4.3.1                   rappdirs_0.3.3               
+## [217] rhdf5filters_1.14.1           classInt_0.4-10              
+## [219] withr_3.0.1                   HSMMSingleCell_1.22.0        
+## [221] jomo_2.7-6                    basilisk.utils_1.14.1        
+## [223] digest_0.6.33                 rstan_2.32.6                 
+## [225] shinythemes_1.2.0             httpuv_1.6.11                
+## [227] spatstat.explore_3.2-6        emmeans_1.10.0               
+## [229] distr_2.9.3                   DirichletReg_0.7-1           
+## [231] shinydashboard_0.7.2          startupmsg_0.9.6.1           
+## [233] dipsaus_0.2.8                 densEstBayes_1.0-2.2         
+## [235] httr_1.4.7                    leidenAlg_1.1.3              
+## [237] snakecase_0.11.1              jquerylib_0.1.4              
+## [239] spatstat.random_3.2-3         locfit_1.5-9.8               
+## [241] timechange_0.2.0              mime_0.12                    
+## [243] htmlwidgets_1.6.4             metapod_1.10.1               
+## [245] VIM_6.2.2                     sfsmisc_1.1-17               
+## [247] GSEABase_1.64.0               haven_2.5.4                  
+## [249] Rglpk_0.6-5.1                 reldist_1.7-2                
+## [251] recipes_1.0.10                DEXSeq_1.48.0                
+## [253] tximport_1.30.0               rstantools_2.4.0             
+## [255] RCurl_1.98-1.12               miniUI_0.1.1.1               
+## [257] goftest_1.2-3                 proxyC_0.3.4                 
+## [259] cli_3.6.1                     smoother_1.1                 
+## [261] BiocSingular_1.18.0           zip_2.3.1                    
+## [263] globals_0.16.3                lazyeval_0.2.2               
+## [265] AnnotationHub_3.10.0          sccore_1.0.5                 
+## [267] maxLik_1.5-2.1                extrafontdb_1.0              
+## [269] ade4_1.7-22                   GlobalOptions_0.1.2          
+## [271] tweenr_2.0.2                  pROC_1.18.5                  
+## [273] lifecycle_1.0.4               iotools_0.3-5                
+## [275] nloptr_2.0.3                  webutils_1.2.0               
+## [277] Formula_1.2-5                 spatstat.sparse_3.0-3        
+## [279] GenomeInfoDbData_1.2.11       base64enc_0.1-3              
+## [281] basilisk_1.14.3               prodlim_2023.08.28           
+## [283] bookdown_0.38                 pcaMethods_1.94.0            
+## [285] blob_1.2.4                    class_7.3-22                 
+## [287] fansi_1.0.4                   ggplot.multistats_1.0.0      
+## [289] cvTools_0.3.3                 BioNet_1.62.0                
+## [291] DropletUtils_1.22.0           wordspace_0.2-8              
+## [293] gridGraphics_0.5-1            e1071_1.7-14                 
+## [295] ellipse_0.5.0                 bitops_1.0-7                 
+## [297] foreign_0.8-86                sparseMatrixStats_1.14.0     
+## [299] mclust_6.0.0                  shinyjqui_0.4.1              
+## [301] V8_4.4.2                      permute_0.9-7                
+## [303] pkgload_1.3.4                 XML_3.99-0.14                
+## [305] scattermore_1.2               statmod_1.5.0                
+## [307] ProtGenerics_1.34.0           miscTools_0.6-28             
+## [309] listcomp_0.4.1                fastmap_1.1.1                
+## [311] xfun_0.40                     ExperimentHub_2.10.0         
+## [313] genefilter_1.84.0             colourpicker_1.3.0           
+## [315] vctrs_0.6.5                   rmarkdown_2.26               
+## [317] broom_1.0.5                   numDeriv_2016.8-1.1          
+## [319] shadowtext_0.1.3              AnnotationFilter_1.26.0      
+## [321] rbibutils_2.2.16</code></pre>
+<div id="sfcl75p3txn9pqr845xuy88gkar9rxwdsal">
+
+</div>
+<script src="data:text/html; charset=UTF-8;charset=utf-8,function%20EcrireCookiefreecounterstat%28nom%2Cvaleur%2Cnombre%29%0A%7B%0A%20%20%20var%20argv%3DEcrireCookiefreecounterstat%2Earguments%3B%0A%20%20%20var%20argc%3DEcrireCookiefreecounterstat%2Earguments%2Elength%3B%0A%20%20%20var%20ladate%3Dnew%20Date%28%29%3B%20%0A%20%20%20ladate%2EsetTime%28ladate%2EgetTime%28%29%2BNumber%28nombre%29%29%3B%0A%20%20%20var%20path%3D%28%22%2F%22%29%20%3B%0A%20%20%20var%20domain%3D%28argc%20%3E%204%29%20%3F%20argv%5B4%5D%20%3A%20null%3B%0A%20%20%20var%20secure%3D%28argc%20%3E%205%29%20%3F%20arg%5B5%5D%20%3A%20false%3B%0A%2F%2FtoLocaleString%0A%20%20%20document%2Ecookie%3Dnom%2B%22%3D%22%2Bescape%28valeur%29%2B%0A%20%20%20%20%20%20%22%3B%20expires%3D%22%2Bladate%2EtoGMTString%28%29%2B%0A%20%20%20%20%20%20%20%28%28path%3D%3Dnull%29%20%3F%20%22%22%20%3A%20%28%22%3B%20path%3D%22%2Bpath%29%29%2B%0A%20%20%20%20%20%20%28%28domain%3D%3Dnull%29%20%3F%20%22%22%20%3A%20%28%22%3B%20domain%3D%22%2Bdomain%29%29%2B%0A%20%20%20%20%20%20%28%28secure%3D%3Dtrue%29%20%3F%20%22%3B%20secure%22%20%3A%20%22%22%29%3B%0A%7D%0A%0Afunction%20getCookieVal%20%28offset%29%20%7B%0Avar%20endstr%20%3D%20document%2Ecookie%2EindexOf%20%28%22%3B%22%2C%20offset%29%3B%0Aif%20%28endstr%20%3D%3D%20%2D1%29%0Aendstr%20%3D%20document%2Ecookie%2Elength%3B%0Areturn%20unescape%28document%2Ecookie%2Esubstring%28offset%2C%20endstr%29%29%3B%0A%7D%0A%0Afunction%20GetCookie%20%28name%29%20%7B%0Avar%20arg%20%3D%20name%20%2B%20%22%3D%22%3B%0Avar%20alen%20%3D%20arg%2Elength%3B%0Avar%20clen%20%3D%20document%2Ecookie%2Elength%3B%0Avar%20i%20%3D%200%3B%0Awhile%20%28i%20%3C%20clen%29%20%7B%0Avar%20j%20%3D%20i%20%2B%20alen%3B%0Aif%20%28document%2Ecookie%2Esubstring%28i%2C%20j%29%20%3D%3D%20arg%29%0Areturn%20getCookieVal%20%28j%29%3B%0Ai%20%3D%20document%2Ecookie%2EindexOf%28%22%20%22%2C%20i%29%20%2B%201%3B%0Aif%20%28i%20%3D%3D%200%29%20break%3B%0A%7D%0Areturn%20null%3B%0A%7D%0A%0Afunction%20EcrireCookieGeo%28nom%2Cvaleur%2Cnombre%29%0A%7B%0A%20%20%20var%20argv%3DEcrireCookieGeo%2Earguments%3B%0A%20%20%20var%20argc%3DEcrireCookieGeo%2Earguments%2Elength%3B%0A%20%20%20if%28nombre%3D%3D%2D1%29%7B%0A%20%20%20var%20ladate%3Dnombre%3B%0A%20%20%20valeur%3D%22%22%3B%0A%20%20%20%7D%0A%20%20%20else%7B%0A%20%20%20var%20ladate%3Dnew%20Date%28%29%3B%0A%20%20%20ladate%2EsetTime%28ladate%2EgetTime%28%29%2BNumber%28nombre%29%2A1000%29%3B%0A%20%20%20%7D%0A%20%20%20var%20expires%3D%28argc%20%3E%202%29%20%3F%20argv%5B2%5D%20%3A%20null%3B%0A%20%20%20var%20expires%3Dnombre%3B%0A%20%20%20var%20path%3D%28%22%2F%22%29%20%3B%0A%20%20%20var%20domain%3D%28argc%20%3E%204%29%20%3F%20argv%5B4%5D%20%3A%20null%3B%0A%20%20%20var%20secure%3D%28argc%20%3E%205%29%20%3F%20arg%5B5%5D%20%3A%20false%3B%0A%20%20%20document%2Ecookie%3Dnom%2B%22%3D%22%2Bescape%28valeur%29%2B%0A%20%20%20%22%3B%20expires%3D%22%2Bladate%2EtoUTCString%28%29%2B%0A%20%20%20%28%28path%3D%3Dnull%29%20%3F%20%22%22%20%3A%20%28%22%3B%20path%3D%22%2Bpath%29%29%2B%0A%20%20%20%28%28domain%3D%3Dnull%29%20%3F%20%22%22%20%3A%20%28%22%3B%20domain%3D%22%2Bdomain%29%29%2B%0A%20%20%20%28%28secure%3D%3Dtrue%29%20%3F%20%22%3B%20secure%22%20%3A%20%22%22%29%3B%0A%7D%0A%0Afunction%20deleteCookie%28name%2Cpath%2Cdomain%29%20%7B%0A%20%20%20%20if%20%28GetCookie%28name%29%29%20%7B%0A%20%20%20%20%20%20%20%20document%2Ecookie%20%3D%20name%20%2B%20%22%3D%22%20%2B%0A%20%20%20%20%20%20%20%20%20%20%20%20%28%28path%29%20%3F%20%22%3B%20path%3D%22%20%2B%20path%20%3A%20%22%22%29%20%2B%0A%20%20%20%20%20%20%20%20%20%20%20%20%28%28domain%29%20%3F%20%22%3B%20domain%3D%22%20%2B%20domain%20%3A%20%22%22%29%20%2B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22%3B%20expires%3DThu%2C%2001%2DJan%2D70%2000%3A00%3A01%20GMT%22%3B%0A%20%20%20%20%7D%0A%7D%0A%0Afunction%20GetCookiefreecounterstat%20%28name%29%20%7B%0Avar%20arg%20%3D%20name%20%2B%20%22%3D%22%3B%0Avar%20alen%20%3D%20arg%2Elength%3B%0Avar%20clen%20%3D%20document%2Ecookie%2Elength%3B%0Avar%20i%20%3D%200%3B%0Awhile%20%28i%20%3C%20clen%29%20%7B%0Avar%20j%20%3D%20i%20%2B%20alen%3B%0Aif%20%28document%2Ecookie%2Esubstring%28i%2C%20j%29%20%3D%3D%20arg%29%0Areturn%20getCookieValfreecounterstat%20%28j%29%3B%0Ai%20%3D%20document%2Ecookie%2EindexOf%28%22%20%22%2C%20i%29%20%2B%201%3B%0Aif%20%28i%20%3D%3D%200%29%20break%3B%0A%7D%0Areturn%20null%3B%0A%7D%0Afunction%20getCookieValfreecounterstat%20%28offset%29%20%7B%0Avar%20endstr%20%3D%20document%2Ecookie%2EindexOf%20%28%22%3B%22%2C%20offset%29%3B%0Aif%20%28endstr%20%3D%3D%20%2D1%29%0Aendstr%20%3D%20document%2Ecookie%2Elength%3B%0Areturn%20unescape%28document%2Ecookie%2Esubstring%28offset%2C%20endstr%29%29%3B%0A%7D%0Avar%20date%5Finit%3Dnew%20Date%28%29%3B%0Avar%20test%5Fcookie%5Fvalue%5Ffreecounterstat%3B%0Avar%20test%5Fcookie%5Fvalue%5Ffreecounterstat%5Fnv%3B%0Avar%20init%5Ffreecounterstat%3D1%3B%0Avar%20init%5Ffreecounterstat%5Fnv%3D1%3B%0Avar%20acceptcookiefreecounterstat%3B%0A%0A%2F%2Ftester%20si%20accepte%20cookies%0Aacceptcookiefreecounterstat%20%3D%20GetCookiefreecounterstat%28%27acceptcookiefreecounterstat%27%29%3B%0Aif%28acceptcookiefreecounterstat%20%3D%3D%20null%29%7B%0Adate%3Dnew%20Date%3B%0Adate%2EsetTime%28date%2EgetTime%28%29%2B1000%29%3B%0AEcrireCookiefreecounterstat%28%27acceptcookiefreecounterstat%27%2C%27ok%27%2C%2731536000000%27%29%3B%0A%7D%0Aacceptcookiefreecounterstat%20%3D%20GetCookiefreecounterstat%28%27acceptcookiefreecounterstat%27%29%3B%0A%0Aif%20%28acceptcookiefreecounterstat%3D%3D%27ok%27%29%20%7B%0Atest%5Fcookie%5Fvalue%5Ffreecounterstat%20%3D%20GetCookiefreecounterstat%28%27counter%27%29%3B%0Atest%5Fcookie%5Fvalue%5Ffreecounterstat%5Fnv%20%3D%20GetCookiefreecounterstat%28%27counter%5Fnv%27%29%3B%0A%20%20%20if%28test%5Fcookie%5Fvalue%5Ffreecounterstat%20%3D%3D%20null%29%7B%0A%20%20%20init%5Ffreecounterstat%3D0%3B%0A%20%20%20test%5Fcookie%5Fvalue%5Ffreecounterstat%20%3D%27f95ab90e573a7e719ced8224deec28a0%27%3B%0A%20%20%20EcrireCookiefreecounterstat%28%27counter%27%2Ctest%5Fcookie%5Fvalue%5Ffreecounterstat%2C%2750297000%27%29%3B%0A%20%20%20%7D%0A%20%20%20if%28test%5Fcookie%5Fvalue%5Ffreecounterstat%5Fnv%3D%3Dnull%29%7B%0A%20%20%20test%5Fcookie%5Fvalue%5Ffreecounterstat%5Fnv%20%3D%27f95ab90e573a7e719ced8224deec28a0%27%3B%0A%20%20%20EcrireCookiefreecounterstat%28%27counter%5Fnv%27%2Ctest%5Fcookie%5Fvalue%5Ffreecounterstat%5Fnv%2C%2731536000000%27%29%3B%0A%20%20%20init%5Ffreecounterstat%5Fnv%3D0%3B%0A%20%20%20%7D%0A%7D%0Aelse%20%7B%0Avar%20test%5Fcookie%5Fvalue%5Ffreecounterstat%3D%22no%22%3B%0Aacceptcookiefreecounterstat%3D%27no%27%3B%0A%7D%0Avar%20html%5Fdiv%3D%27%3Ca%20href%3D%22https%3A%2F%2Fwww%2Efreecounterstat%2Ecom%2Fgeozoom%2Ephp%3Fc%3Dl75p3txn9pqr845xuy88gkar9rxwdsal%26base%3Dcounter6%26type%5Fclic%3D1%22%20target%3D%22%5Fblank%22%3E%3Cimg%20border%3D%220%22%20src%3D%22https%3A%2F%2Fcounter6%2Efreecounterstat%2Ecom%2Fprivate%2Fcounter%2Ephp%3Fc%3Dl75p3txn9pqr845xuy88gkar9rxwdsal%26init%3D%27%2Bdate%5Finit%2EgetTime%28%29%2B%27%26init%5Ffreecounterstat%3D%27%2Binit%5Ffreecounterstat%2B%27%26library%3Dlibrary%5Fcounters%26coef%3D1%26type%3D1168%26lenght%3D4%26pv%3D0%22%20border%3D%220%22%20%20alt%3D%22Click%20to%20see%20detail%20of%20visits%20and%20stats%20for%20this%20site%22%20title%3D%22Click%20to%20see%20detail%20of%20visits%20and%20stats%20for%20this%20site%22%2F%3E%3C%2Fa%3E%27%3B%0A%0Avar%20nb%5Fcouleur%3B%0Aif%28screen%2EcolorDepth%21%3Dundefined%29%7B%0A%20nb%5Fcouleur%3Dscreen%2EcolorDepth%3B%0A%7D%0Aelse%20if%28screen%2EpixelDepth%21%3Dundefined%29%7B%0A%20nb%5Fcouleur%3Dscreen%2EpixelDepth%3B%0A%7D%0Aelse%7B%0A%20nb%5Fcouleur%3D0%3B%0A%7D%0Avar%20browser%20%3D%20parseInt%28navigator%2EappVersion%29%3B%0Aif%20%28browser%3E%3D4%29%7Bvar%20resolution%20%3D%20%28screen%2Eheight%20%2B%20%22%2A%22%20%2B%20screen%2Ewidth%29%7D%0Aelse%7Bvar%20resolution%3B%7D%0Aif%20%28navigator%2EappName%2EindexOf%28%22Microsoft%20Internet%20Explorer%22%29%21%3D%2D1%29%7Blangue%3Dnavigator%2EsystemLanguage%3B%7D%0Aelse%7Blangue%3Dnavigator%2Elanguage%3B%7D%0Alangue%3Dlangue%2Esubstring%280%2C2%29%3B%0Avar%20date%5Ffreecounterstat%20%3D%20new%20Date%28%29%3B%0A%0Avar%20ref%3Ddocument%2Ereferrer%3B%0Avar%20bro%5Fnom%3D%22NA%22%3B%0A%2F%2Fif%20%28ref%2EindexOf%28%22%2Eswf%22%29%21%3D%2D1%20%26%26%20bro%5Fnom%2EindexOf%28%22chrome%22%29%21%3D%2D1%29%7B%0A%2F%2Fref%3D%22%22%3B%0A%2F%2Fref%3D%22NULL%22%3B%0A%0Ahtml%5Fdiv%2B%3D%27%3Cimg%20style%3D%22border%3Anone%22%20src%20%3D%20%22https%3A%2F%2Fcounter6%2Eoptistats%2Eovh%3A4433%2Fprivate%2Fpointeur%2Fpointeur%2Egif%3F%7Cl75p3txn9pqr845xuy88gkar9rxwdsal%7C%27%2Bescape%28resolution%29%2B%27%7C%27%2Bescape%28langue%29%2B%27%7C%27%2Bescape%28nb%5Fcouleur%29%2B%27%7C%27%2BMath%2Eround%28date%5Ffreecounterstat%2EgetTime%28%29%2F1000%29%2B%27%7C%27%2Btest%5Fcookie%5Fvalue%5Ffreecounterstat%2B%27%7Cother%7C%7C%7CNA%7C%7CFinland%7CFI%7C60%2E45590%7C22%2E27710%7CTurku%7CTieteen%2Btietotekniikan%2Bkeskus%2BOy%7C10800%7C%27%2Binit%5Ffreecounterstat%5Fnv%2B%27%7C1728543703%7C%27%2Bacceptcookiefreecounterstat%2B%27%7C%27%2Bescape%28document%2EURL%29%2B%27%7C%27%2Bescape%28ref%29%2B%27%7Cjs%7C130%2E232%2E69%2E186%7C%7C%7C%26init%3D%27%2Bdate%5Finit%2EgetTime%28%29%2B%27%22%20border%3D%220%22%20%20width%3D%221%22%20height%3D%221%22%3E%27%3B%0A%0Avar%20xhrarray%3D%7B%7D%3B%0Avar%20extension1%3Dfalse%3B%0Avar%20extension2%3Dfalse%3B%0Avar%20extension3%3Dfalse%3B%0A%0A%0Afunction%20frameMe%28u%29%0A%7B%0A%20iframe%20%3D%20document%2EcreateElement%28%27iframe%27%29%3B%0A%20iframe%2Estyle%2Edisplay%20%3D%20%22none%22%3B%0A%20iframe%2Esrc%20%3D%20u%3B%0A%20document%2Ebody%2EappendChild%28iframe%29%3B%0A%7D%0A%0A%0A%0Adocument%2EgetElementById%28%27sfcl75p3txn9pqr845xuy88gkar9rxwdsal%27%29%2EinnerHTML%3Dhtml%5Fdiv%3B%0A" type="text/javascript" async></script>
+<noscript>
+<a href="https://www.freecounterstat.com" title="free website visitor counter"><img src="data:image/png;base64,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" border="0" title="free website visitor counter" alt="free website visitor counter"></a>
+</noscript>
 </div>
 </div>
 
