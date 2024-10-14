@@ -104,7 +104,6 @@ Sys.unsetenv("GITHUB_PAT");
 
 
 
-
 # Importing Data and Metadata
 ```{r, warning=FALSE,message=FALSE}
 #https://stackoverflow.com/questions/47295443/r-install-package-loaded-namespace
@@ -202,7 +201,7 @@ Sys.unsetenv("GITHUB_PAT");
 
 
 
-# Preporsessing Function Before Analysis
+# The preporsessing function before the analysis
 ```{r, warning=FALSE,message=FALSE,fig.width=8.0}
 
 Pre_anal_process=function(data,small,case='E11',mart) { #small to 'yes' if you have low number of cells in the sample
@@ -452,6 +451,9 @@ Pre_anal_process=function(data,small,case='E11',mart) { #small to 'yes' if you h
 
 
 
+
+
+
 # Computational Analysis Functions
 ```{r, warning=FALSE,message=FALSE,fig.width=8.0}
 
@@ -650,6 +652,7 @@ dispersion_removal=function(vari) {
 
 
 
+
 # Execution of Preprocessing and Initial Analysis
 ```{r, warning=FALSE,message=FALSE,fig.width=8.0}
 
@@ -694,29 +697,55 @@ dispersion_removal=function(vari) {
 # date3[[1]]; date3[[2]]; date3[[3]]; Data3=date3[[1]]
 # name=paste('E16.5_int_ok',namedate,'.rds'); saveRDS(Data3, name) #check the name..
 # 
+```
+
+
+
+
+
+# Plotting Your Data
+```{r, warning=FALSE,message=FALSE,fig.width=8.0}
 
 #If needed you can play around with the optimal conditions, such as no of PCs/'cond', r level and 
 # basic_lustering_all=function(Data1) {
 # DefaultAssay( Data1) <- "integrated"
-# PC='Default'; cond='no'; rs=0.7;latex=c();  
-# #Default, or 0.7 or 1.07 produces the smaller nub '18', but 1.05/6.. not or 2-10 #2.4 ->10"
+# PC='Default'; cond='no'; rs=0.7;latex=c();  #Default, or 0.7 or 1.07 produces the smaller nub '18', but 1.05/6.. not or 2-10 #2.4 ->10"
 # latex=Cluster_iteration(Data1,PC,rs,cond) #Check if it is data or data1 or data2 etc.
-# Data1=latex[[1]];} #latex[[2]] #This is the combined data!
-# 
+# Data1=latex[[1]]; #latex[[2]] #This is the combined data!
+# }
 # 
 # Data1=basic_lustering_all(Data1);Data2=basic_lustering_all(Data2);Data3=basic_lustering_all(Data3);
-# 
 
+Data1=readRDS("C:/Users/patati/Documents/GitHub/scRNAseq_data_analysis/E11.25_PCt tikka011024 .rds")
+Data2=readRDS("C:/Users/patati/Documents/GitHub/scRNAseq_data_analysis/E14.5_PCt tikka011024 .rds")
+Data3=readRDS("C:/Users/patati/Documents/GitHub/scRNAseq_data_analysis/E16.5_PCt tikka011024 .rds")
+  
+# Visualization is separately, but this is here as a part of quality control, you need to have also the genes of interest Pitx2 shown in the umaps:
+DimPlot(Data1,reduction="umap",pt.size = 2, label = TRUE, label.size = 7,group.by = 'seurat_clusters');
+DimPlot(Data2,reduction="umap",pt.size = 2, label = TRUE, label.size = 7,group.by = 'seurat_clusters');
+DimPlot(Data3,reduction="umap",pt.size = 2, label = TRUE, label.size = 7,group.by = 'seurat_clusters');
+
+# DefaultAssay( Data1) <- "integrated"; vars=c('Pitx2','Acta2','Cdh5','Vim');
+# FeaturePlot(Data1, features = vars,cols = c("#c0c0c0",'red'),pt.size = 1,order=TRUE,min.cutoff=0,ncol=4, split.by=NULL)
+# DefaultAssay( Data1) <- "RNA"; vars=c('Sox2','Shh');
+# FeaturePlot(Data1, features = vars,cols = c("#c0c0c0",'red'),pt.size = 1,order=TRUE,min.cutoff=0,ncol=4, split.by=NULL)
+
+# This is again a place where you want to save the whole environment, unless you want to do the loading and processing every time, which is like 15min per stage, i.e. like 1h
+# save.image("C:/Users/patati/Desktop/TurkuOW/RWork/all_good.RData") #ok 9.10.24
+load("C:/Users/patati/Desktop/TurkuOW/RWork/all_good.RData")
 # saveRDS(Data1, file = paste('E11.25_PCt',namedate,'.rds')) # datto2 = readRDS(file = "E11.5_double int_r0.15_pc8_ptt30323.rds")
 # saveRDS(Data2, file = paste('E14.5_PCt',namedate,'.rds')) # datto2 = readRDS(file = "E11.5_double int_r0.15_pc8_ptt30323.rds")
 # saveRDS(Data3, file = paste('E16.5_PCt',namedate,'.rds')) # datto2 = readRDS(file = "E11.5_double int_r0.15_pc8_ptt30323.rds")
-# # And of course the loading
+# And of course the loading
 
-# Data1=readRDS("C:/Users/patati/Documents/GitHub/scRNAseq_data_analysis/E11.25_PCt tikka011024 .rds")
-# Data2=readRDS("C:/Users/patati/Documents/GitHub/scRNAseq_data_analysis/E14.5_PCt tikka011024 .rds")
-# Data3=readRDS("C:/Users/patati/Documents/GitHub/scRNAseq_data_analysis/E16.5_PCt tikka011024 .rds")
-  
+
+
+
+
 ```
+
+
+
 
 # Visualizations
 ```{r, warning=FALSE,message=FALSE,fig.width=8.0}
@@ -730,31 +759,13 @@ dispersion_removal=function(vari) {
 #it is good to put one data 'type' as a folder:
 #https://github.com/satijalab/seurat/issues/1528 #this is relatively ok, but some cells are in other clusters than thier own e.g. 5 and 10
 
-
-# DefaultAssay( Data1) <- "integrated"; vars=c('Pitx2','Acta2','Cdh5','Vim');
-# FeaturePlot(Data1, features = vars,cols = c("#c0c0c0",'red'),pt.size = 1,order=TRUE,min.cutoff=0,ncol=4, split.by=NULL)
-# DefaultAssay( Data1) <- "RNA"; vars=c('Sox2','Shh');
-# FeaturePlot(Data1, features = vars,cols = c("#c0c0c0",'red'),pt.size = 1,order=TRUE,min.cutoff=0,ncol=4, split.by=NULL)
-
-# This is again a place where you want to save the whole environment, unless you want to do the loading and processing every time, which is like 15min per stage, i.e. like 1h
-# save.image("C:/Users/patati/Desktop/TurkuOW/RWork/all_good.RData") #ok 9.10.24
-load("C:/Users/patati/Desktop/TurkuOW/RWork/all_good.RData")
-
-
-# Visualization is separately, but this is here as a part of quality control, you need to have also the genes of interest Pitx2 shown in the umaps:
-DimPlot(Data1,reduction="umap",pt.size = 2, label = TRUE, label.size = 7,group.by = 'seurat_clusters');
-DimPlot(Data2,reduction="umap",pt.size = 2, label = TRUE, label.size = 7,group.by = 'seurat_clusters');
-DimPlot(Data3,reduction="umap",pt.size = 2, label = TRUE, label.size = 7,group.by = 'seurat_clusters');
-
-
-vari=Data1 #readRDS('E11.5_big_ok Tikka 15.5.23 .rds')# head(colnames(vari@assay$RNA@counts)) #or epim or... check this(!)
-# DimPlot(vari, label = TRUE, label.size = 7,pt.size = 1,group.by = 'seurat_clusters',order=FALSE) #+ xlim(-11,-2)#+ xlim(-4,4)+ylim(7,9)+ ggtitle("") #remember to add group.by = 'seurat_clusters' or Sub_cluster
+vari=Data1#readRDS('E11.5_big_ok Tikka 15.5.23 .rds')# head(colnames(vari@assay$RNA@counts)) #or epim or... check this(!)
+DimPlot(vari, label = TRUE, label.size = 7,pt.size = 1,group.by = 'seurat_clusters',order=FALSE) #+ xlim(-11,-2)#+ xlim(-4,4)+ylim(7,9)+ ggtitle("") #remember to add group.by = 'seurat_clusters' or Sub_cluster
 data=vari; DefaultAssay( data) <- "SCT";  data@active.ident =data$seurat_clusters #!!
 clusta=length(table ( Idents( data) )); options(scipen = 999);clusta
 gc(); memory.limit(9999999999999);
 
-# Näillä selviää Monocle Pseudotimen alku: 
-# https://sib-swiss.github.io/single-cell-training/2021.11/day3/trajectory_analysis/
+# Näillä selviää Monocle Pseudotimen alku: #https://sib-swiss.github.io/single-cell-training/2021.11/day3/trajectory_analysis/
 
 
 DefaultAssay(vari) <- 'RNA' #check..."SCT"; #vari=vari; # vari=mes3a; c('Pitx2','Sox2','Shh','Acta2') #'Vim','Msx1'
@@ -776,11 +787,9 @@ FeaturePlot(vari, reduction = "umap", features = vars[1],pt.size = 2, order=T,co
 FeaturePlot(vari, reduction = "umap",features = vars,cols = c("#c0c0c0",'red'),pt.size = 1.5, order=TRUE,ncol=3, min.cutoff = 1)& a  & b & NoLegend();#dev.off()
 # jpeg(paste("UMAP_Clusters", nmj, '.jpg'), width = width, height = height, quality = 100,pointsize = 14, res=1200);#,'orange', 'yellow #https://statisticsglobe.com/change-font-size-of-ggplot2-plot-in-r-axis-text-main-title-legend
 # label order: E14_epit$seurat_clusters <- factor(E14_epit$seurat_clusters, levels = c(1:5)) 
-
-vari=dispersion_removal(vari) 
 DimPlot( vari, reduction = "umap",pt.size = 2, label = TRUE, label.size =10.5 ,group.by = 'seurat_clusters',order=TRUE) +ggtitle('') +  
-   theme(axis.title = element_text(size = 10.5)) + theme(legend.text = element_text(size = 10.5)) + guides(colour = guide_legend(override.aes = list(size=10.5))) & a  & b;#dev.off()
-# table(vari$orig.ident);#table(vari$seurat_clusters)
+  theme(axis.title = element_text(size = 10.5)) + theme(legend.text = element_text(size = 10.5)) + guides(colour = guide_legend(override.aes = list(size=10.5))) & a  & b;#dev.off()
+table(vari$orig.ident);#table(vari$seurat_clusters)
 
 #Just to get the scale to the primary genes:
 DefaultAssay(vari)='RNA'#'SCT'; #RNA gives small Pitx2 values so use SCT here as well as with ScaleData below
@@ -877,9 +886,9 @@ for (i in 1:clusta) {
   cx <- c(0,cumsum(marker_cosg$scores[1:300,i])); n=70 #n is the max de thershold amount of all the data
   rsum =append(rsum,(cx[(n+1):length(cx)] - cx[1:(length(cx) - n)]) / n) }#https://stackoverflow.com/questions/743812/calculating-moving-average
 jap=matrix(as.vector(rsum),nrow=231,ncol=clusta) #https://stat.ethz.ch/R-manual/R-devel/library/base/html/matrix.html
-# for (i in 1:clusta) {
-#   jpeg(paste("lines",i,".jpg"), width = 1000, height = 1000, quality = 100,pointsize = 3, res=300);  
-#   plot(1:120,jap[1:120,i]);dev.off() }
+for (i in 1:clusta) {
+  jpeg(paste("lines",i,".jpg"), width = 1000, height = 1000, quality = 100,pointsize = 3, res=300);  
+  plot(1:120,jap[1:120,i]);dev.off() }
 dth=c()
 for (i in 1:clusta) {y=jap[1:120,i];x <- seq_along(y)
 plot(y ~ x); fit0 <- lm(y ~ x) #https://stackoverflow.com/questions/45295856/how-to-find-linear-trend-in-r
@@ -1076,14 +1085,14 @@ ymi=unlist(strsplit(minMax(hopl$data$UMAP_2,maxDecimals = 2)[2]$result, ";", fix
 yma=unlist(strsplit(minMax(hopl$data$UMAP_2,maxDecimals = 2)[2]$result, ";", fixed = TRUE))[2];yma=ceiling(as.numeric(yma))
 xmi;xma;ymi; yma #check that these are ok
 a=xlim(xmi,xma); b=ylim(ymi, yma)
-# prints
+prints
 for (i in 1:prints) {
   # jpeg(paste(nmj,"UMAPs of COSG genesi",i,".jpg"), width = width, height = height, quality = 100,pointsize = 1, res=1200); #width = 12000, height = 9700, CHECK X AND YLIMS!!!
   prt=FeaturePlot(lena, reduction = "umap",features = vt[(16*i-16+1):(16*i)],slot='scale.data',pt.size = 1, order=T,cols = c("#c0c0c0",'red'),min.cutoff=1,ncol=4) &  a & b;
   for(j in 1:15) {prt[[j]] <- prt[[j]]  & NoLegend() }; #https://samuel-marsh.github.io/scCustomize/articles/Gene_Expression_Plotting.html # Alternative way to add the scale could be  to copy paste it in to image
   prt} #print(prt);dev.off()} # https://github.com/satijalab/seurat/issues/1080 to print just one scale automatically...
 
-# i;j #j-1 goes to below:
+i;j #j-1 goes to below:
 # for(j in (length(prt)+1):(16-length(prt)+1)) 
 # he=list(prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]],prt[[3]])
 prt=prt[[1]]+prt[[2]]+prt[[3]]+prt[[4]]+prt[[5]]+prt[[6]]+prt[[7]]+prt[[8]]+prt[[9]]+prt[[9]]+prt[[9]]+
@@ -1241,7 +1250,6 @@ print(prt);
 
 
 
-
 # About R Setups
 ```{r, warning=FALSE,message=FALSE}
 # As per this date, see above or below, 
@@ -1253,9 +1261,6 @@ thedate
 # In addition, the following information regarding the setups is given:
 sessionInfo()
 ```
-
-
-
 
 
 ```{r, echo=FALSE} 
